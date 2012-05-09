@@ -1,0 +1,15 @@
+/* Regex Colorizer default theme */
+
+.regex       {font-family: Monospace;}
+.regex b     {background: #aad1f7;} /* metasequence */
+.regex i     {background: #e3e3e3;} /* char class */
+.regex i b   {background: #9fb6dc;} /* char class: metasequence */
+.regex i u   {background: #c3c3c3;} /* char class: range-hyphen */
+.regex b.g1  {background: #b4fa50; color: #000;} /* group: depth 1 */
+.regex b.g2  {background: #8cd400; color: #000;} /* group: depth 2 */
+.regex b.g3  {background: #26b809; color: #fff;} /* group: depth 3 */
+.regex b.g4  {background: #30ea60; color: #000;} /* group: depth 4 */
+.regex b.g5  {background: #0c8d15; color: #fff;} /* group: depth 5 */
+.regex b.err {background: #e30000; color: #fff;} /* error */
+.regex b, .regex i, .regex u {font-weight: normal; font-style: normal; text-decoration: none;}
+
