@@ -1,4 +1,4 @@
-/*! Regex Colorizer v0.3
+/*! Regex Colorizer v0.3.1
  * (c) 2010-2012 Steven Levithan <http://stevenlevithan.com/regex/colorizer/>
  * MIT license
  */
@@ -512,7 +512,8 @@ var RegexColorizer = (function () {
                 ".regex b.g5  {background: #0c8d15; color: #fff;} " + // group: depth 5
                 ".regex b.err {background: #e30000; color: #fff;} " + // error
                 ".regex b, .regex i, .regex u {font-weight: normal; font-style: normal; text-decoration: none;}";
-        // Needs to come first for IE < 9
+        ss.id = "regex-colorizer-ss";
+        // Need to add to the DOM before setting cssText for IE < 9
         document.getElementsByTagName("head")[0].appendChild(ss);
         // Can't use innerHTML or innerText for stylesheets in IE < 9
         if (ss.styleSheet) {
@@ -525,4 +526,3 @@ var RegexColorizer = (function () {
     return self;
 
 }());
-

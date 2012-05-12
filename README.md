@@ -5,7 +5,7 @@ Adds syntax highlighting to regular expressions for readability. Currently, only
 Use the following code to run Regex Colorizer for all elements on a page with class `regex`:
 
 ~~~ js
-// Don't need this line if you provide your own stylesheet
+// Don't run this line if you provide your own stylesheet
 RegexColorizer.addStyleSheet();
 
 // Can provide a class name for elements to process (defaults to 'regex')
@@ -24,4 +24,3 @@ Regex Colorizer copyright 2010-2012 by [Steven Levithan](http://stevenlevithan.c
 Released under the [MIT License](http://mit-license.org/).
 
 Fork me to show support, fix, and extend.
-

@@ -12,4 +12,3 @@
 .regex b.g5  {background: #0c8d15; color: #fff;} /* group: depth 5 */
 .regex b.err {background: #e30000; color: #fff;} /* error */
 .regex b, .regex i, .regex u {font-weight: normal; font-style: normal; text-decoration: none;}
-
