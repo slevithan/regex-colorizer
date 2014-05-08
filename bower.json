@@ -1,0 +1,8 @@
+{
+  "name": "regex-colorizer",
+  "version": "0.3.1",
+  "authors": [
+    "Steven Levithan <steves_list@hotmail.com>"
+  ],
+  "dependencies": {}
+}
