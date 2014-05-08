@@ -1,0 +1,14 @@
+{
+  "name": "regex-colorizer",
+  "version": "0.3.1",
+  "license": "MIT",
+  "authors": [
+    "Steven Levithan <steves_list@hotmail.com>"
+  ],
+  "keywords": [
+    "regex",
+    "regexp",
+    "syntax",
+    "highlight"
+  ]
+}
