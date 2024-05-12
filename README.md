@@ -1,6 +1,6 @@
 ﻿# Regex Colorizer v0.3.1-next
 
-Adds syntax highlighting to regular expressions for readability. Supports the JavaScript regex flavor, with extensions for web reality. Any regex features not supported by JavaScript are marked as errors, along with some edge cases that cause cross-browser grief. Syntax changes enabled by flags `u` and `v` are not yet supported.
+Adds syntax highlighting to regular expressions for readability. Supports the JavaScript regex flavor, with extensions for web reality. Any regex features not supported by JavaScript are marked as errors, along with some edge cases that cause cross-browser grief. Syntax changes activated by flags `u` and `v` are not yet supported.
 
 Use the following code to run Regex Colorizer for all elements on a page with class `regex`:
 

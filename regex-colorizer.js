@@ -7,7 +7,7 @@
 // Adds syntax highlighting to regular expressions for readability. Supports the JavaScript regex
 // flavor, with extensions for web reality. Any regex features not supported by JavaScript are
 // marked as errors, along with some edge cases that cause cross-browser grief. Syntax changes
-// enabled by flags `u` and `v` are not yet supported.
+// activated by flags `u` and `v` are not yet supported.
 
 const RegexColorizer = (() => {
 
@@ -15,9 +15,9 @@ const RegexColorizer = (() => {
 // Private variables
 // ------------------------------------
 
-  const regexToken = /\[\^?]?(?:[^\\\]]+|\\.?)*]?|\\(?:0(?:[0-3][0-7]{0,2}|[4-7][0-7]?)?|[1-9]\d*|x[\dA-Fa-f]{2}|u[\dA-Fa-f]{4}|c[A-Za-z]|k<[A-Za-z_]\w*>|.?)|\((?:\?(?:<(?:[=!]|[A-Za-z_]\w*>)|[:=!]?))?|(?:[?*+]|\{\d+(?:,\d*)?\})\??|[^.?*+^${[()|\\]+|./gs;
+  const regexToken = /\[\^?(?:[^\\\]]+|\\.?)*]?|\\(?:0(?:[0-3][0-7]{0,2}|[4-7][0-7]?)?|[1-9]\d*|x[\dA-Fa-f]{2}|u[\dA-Fa-f]{4}|c[A-Za-z]|k<[A-Za-z_]\w*>|.?)|\((?:\?(?:<(?:[=!]|[A-Za-z_]\w*>)|[:=!]?))?|(?:[?*+]|\{\d+(?:,\d*)?\})\??|[^.?*+^${[()|\\]+|./gs;
   const charClassToken = /[^\\-]+|-|\\(?:[0-3][0-7]{0,2}|[4-7][0-7]?|x[\dA-Fa-f]{2}|u[\dA-Fa-f]{4}|c[A-Za-z]|.?)/gs;
-  const charClassParts = /^(?<opening>\[\^?)(?<content>]?(?:[^\\\]]+|\\.?)*)(?<closing>]?)$/s;
+  const charClassParts = /^(?<opening>\[\^?)(?<content>(?:[^\\\]]+|\\.?)*)(?<closing>]?)$/s;
   const quantifier = /^(?:[?*+]|\{\d+(?:,\d*)?\})\??$/;
   const type = {
       NONE: 0,
