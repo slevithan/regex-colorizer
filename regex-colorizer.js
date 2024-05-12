@@ -4,8 +4,10 @@
  * <https://stevenlevithan.com/regex/colorizer/>
  */
 
-// Regex Colorizer v0.1 was extracted from RegexPal v0.1.4.
-// Currently supports only ES5 (with web reality) regex syntax.
+// Adds syntax highlighting to regular expressions for readability. Supports the JavaScript regex
+// flavor, with extensions for web reality. Any regex features not supported by JavaScript are
+// marked as errors, along with some edge cases that cause cross-browser grief. Syntax changes
+// enabled by flags `u` and `v` are not yet supported.
 
 const RegexColorizer = (() => {
 
@@ -13,7 +15,7 @@ const RegexColorizer = (() => {
 // Private variables
 // ------------------------------------
 
-  const regexToken = /\[\^?]?(?:[^\\\]]+|\\.?)*]?|\\(?:0(?:[0-3][0-7]{0,2}|[4-7][0-7]?)?|[1-9]\d*|x[\dA-Fa-f]{2}|u[\dA-Fa-f]{4}|c[A-Za-z]|.?)|\((?:\?(?:<(?:[=!]|[A-Za-z_]\w*>)|[:=!]?))?|(?:[?*+]|\{\d+(?:,\d*)?\})\??|[^.?*+^${[()|\\]+|./gs;
+  const regexToken = /\[\^?]?(?:[^\\\]]+|\\.?)*]?|\\(?:0(?:[0-3][0-7]{0,2}|[4-7][0-7]?)?|[1-9]\d*|x[\dA-Fa-f]{2}|u[\dA-Fa-f]{4}|c[A-Za-z]|k<[A-Za-z_]\w*>|.?)|\((?:\?(?:<(?:[=!]|[A-Za-z_]\w*>)|[:=!]?))?|(?:[?*+]|\{\d+(?:,\d*)?\})\??|[^.?*+^${[()|\\]+|./gs;
   const charClassToken = /[^\\-]+|-|\\(?:[0-3][0-7]{0,2}|[4-7][0-7]?|x[\dA-Fa-f]{2}|u[\dA-Fa-f]{4}|c[A-Za-z]|.?)/gs;
   const charClassParts = /^(?<opening>\[\^?)(?<content>]?(?:[^\\\]]+|\\.?)*)(?<closing>]?)$/s;
   const quantifier = /^(?:[?*+]|\{\d+(?:,\d*)?\})\??$/;
@@ -279,7 +281,8 @@ const RegexColorizer = (() => {
         if (m.length === 2) { // m is '(?'
           output += errorize(m, error.INVALID_GROUP_TYPE);
         } else {
-          if (m.length === 1) {
+          // TODO: Capture names must be unique
+          if (m.length === 1 || /^\(\?<[a-z_]/i.test(m)) {
             capturingGroupCount++;
           }
           groupStyleDepth = groupStyleDepth === 5 ? 1 : groupStyleDepth + 1;
@@ -346,6 +349,16 @@ const RegexColorizer = (() => {
             const parts = /^\\([0-3][0-7]{0,2}|[4-7][0-7]?|[89])(\d*)/.exec(m);
             output += `<b>\\${parts[1]}</b>${parts[2]}`;
           }
+          lastToken = {
+            quantifiable: true,
+          };
+        // Named backreference
+        } else if (char1 === 'k') {
+          // TODO: Add correct handling for \k (assuming no flag u or v):
+          // - If a named capture appears anywhere (before or after), treat as backreference
+          // - Otherwise, it's a literal '\k'
+          // - In backreference mode, error if name doesn't appear in a capture (before or after)
+          output += `<b>${expandHtmlEntities(m)}</b>`;
           lastToken = {
             quantifiable: true,
           };
