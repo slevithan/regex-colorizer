@@ -13,7 +13,7 @@ const RegexColorizer = (() => {
 // Private variables
 // ------------------------------------
 
-  const regexToken = /\[\^?]?(?:[^\\\]]+|\\.?)*]?|\\(?:0(?:[0-3][0-7]{0,2}|[4-7][0-7]?)?|[1-9]\d*|x[\dA-Fa-f]{2}|u[\dA-Fa-f]{4}|c[A-Za-z]|.?)|\((?:\?[:=!]?)?|(?:[?*+]|\{\d+(?:,\d*)?\})\??|[^.?*+^${[()|\\]+|./gs;
+  const regexToken = /\[\^?]?(?:[^\\\]]+|\\.?)*]?|\\(?:0(?:[0-3][0-7]{0,2}|[4-7][0-7]?)?|[1-9]\d*|x[\dA-Fa-f]{2}|u[\dA-Fa-f]{4}|c[A-Za-z]|.?)|\((?:\?(?:<[=!]|[:=!]?))?|(?:[?*+]|\{\d+(?:,\d*)?\})\??|[^.?*+^${[()|\\]+|./gs;
   const charClassToken = /[^\\-]+|-|\\(?:[0-3][0-7]{0,2}|[4-7][0-7]?|x[\dA-Fa-f]{2}|u[\dA-Fa-f]{4}|c[A-Za-z]|.?)/gs;
   const charClassParts = /^(?<opening>\[\^?)(?<content>]?(?:[^\\\]]+|\\.?)*)(?<closing>]?)$/s;
   const quantifier = /^(?:[?*+]|\{\d+(?:,\d*)?\})\??$/;
@@ -289,10 +289,10 @@ const RegexColorizer = (() => {
           // element with group-depth class.
           openGroups.push({
             index: output.length + '<b class="gN">'.length,
-            opening: m
+            opening: expandHtmlEntities(m),
           });
           // Add markup to the group-opening character sequence
-          output += groupize(m, groupStyleDepth);
+          output += groupize(expandHtmlEntities(m), groupStyleDepth);
         }
         lastToken = {
           quantifiable: false,
