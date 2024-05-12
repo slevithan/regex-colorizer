@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <title>Regex Colorizer</title>
 
-  <link id="default-ss" href="themes/default.css" rel="stylesheet" title="Default">
-  <link id="nobg-ss" href="themes/nobg.css" rel="alternate stylesheet" title="No BG">
-  <link id="regexpal-ss" href="themes/regexpal.css" rel="alternate stylesheet" title="RegexPal">
-  <link id="regexbuddy-ss" href="themes/regexbuddy.css" rel="alternate stylesheet" title="RegexBuddy">
+  <link id="default-ss" href="../themes/default.css" rel="stylesheet" title="Default">
+  <link id="nobg-ss" href="../themes/nobg.css" rel="alternate stylesheet" title="No BG">
+  <link id="regexpal-ss" href="../themes/regexpal.css" rel="alternate stylesheet" title="RegexPal">
+  <link id="regexbuddy-ss" href="../themes/regexbuddy.css" rel="alternate stylesheet" title="RegexBuddy">
 
   <style>
     body {
@@ -47,6 +47,12 @@
   <pre class="regex">Hello+?? x*+ |? a{1,2}b{2,1} ||(?:a|b)* (?=x)* (?&lt;=n) (((((((a)))b.c)d|x(y)z{65536,}))))
 [1-59-6\b-\cX.a-\w!---] \xFF \x \uFF\uFFFF\z\v\\\</pre>
 
+  <h2>Try it</h2>
+
+  <textarea id="input" rows="4" cols="80" placeholder="Type a regex pattern" spellcheck="false" oninput="colorizeInput()"></textarea>
+
+  <p><pre id="output" class="regex">Type a regex pattern</pre></p>
+
   <h2>Themes</h2>
 
   <button onclick="setTheme('default')">Default</button>
@@ -54,7 +60,7 @@
   <button onclick="setTheme('regexpal')">RegexPal</button>
   <button onclick="setTheme('regexbuddy')">RegexBuddy</button>
 
-  <script src="regex-colorizer.js"></script>
+  <script src="../regex-colorizer.js"></script>
   <script>
     RegexColorizer.colorizeAll();
 
@@ -62,6 +68,11 @@
       // Need to disable all before enabling active stylesheet
       document.querySelectorAll('link').forEach(el => el.disabled = true);
       document.getElementById(`${name}-ss`).disabled = false;
+    }
+
+    function colorizeInput() {
+      const regexHtml = RegexColorizer.colorizeText(document.getElementById('input').value);
+      document.getElementById('output').innerHTML = regexHtml;
     }
   </script>
 </body>
