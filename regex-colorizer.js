@@ -449,7 +449,7 @@ const RegexColorizer = (() => {
       numCharsAdded += errorize('', error.UNBALANCED_LEFT_PAREN).length;
     }
 
-    return output;
+    return output.replace(/\r?\n/g, '<br>');
   };
 
   /**
