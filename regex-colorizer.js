@@ -353,10 +353,10 @@ const RegexColorizer = (() => {
             quantifiable: true,
           };
         // Named backreference
-        } else if (char1 === 'k') {
-          // TODO: Add correct handling for \k (assuming no flag u or v):
+        } else if (char1 === 'k' && m.length > 2) {
+          // TODO: Add correct handling for \k<name> (assuming no flag u or v):
           // - If a named capture appears anywhere (before or after), treat as backreference
-          // - Otherwise, it's a literal '\k'
+          // - Otherwise, it's a literal '\k<name>'
           // - In backreference mode, error if name doesn't appear in a capture (before or after)
           output += `<b>${expandHtmlEntities(m)}</b>`;
           lastToken = {
@@ -393,7 +393,7 @@ const RegexColorizer = (() => {
           // Don't need to set lastToken since this is the end of the line
         // Escaped literal character
         } else {
-          output += expandHtmlEntities(m);
+          output += `<span>${expandHtmlEntities(m)}</span>`;
           lastToken = {
             quantifiable: true,
           };
@@ -489,10 +489,11 @@ const RegexColorizer = (() => {
     ss.id = 'regex-colorizer-ss';
     ss.textContent = `
       .regex        {font-family: Monospace;}
+      .regex span   {background: #efefef;} /* escaped literal */
       .regex b      {background: #aad1f7;} /* metasequence */
       .regex i      {background: #e3e3e3;} /* char class */
       .regex i span {background: #c3c3c3;} /* char class: boundaries */
-      .regex i b    {background: #9fb6dc;} /* char class: metasequence */
+      .regex i b    {background: #c3c3c3;} /* char class: metasequence */
       .regex i u    {background: #d3d3d3;} /* char class: range-hyphen */
       .regex b.g1   {background: #b4fa50; color: #000;} /* group: depth 1 */
       .regex b.g2   {background: #8cd400; color: #000;} /* group: depth 2 */
