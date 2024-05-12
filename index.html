@@ -1,65 +1,68 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <title>Regex Colorizer</title>
+  <meta charset="utf-8">
+  <title>Regex Colorizer</title>
 
-    <link id="default-ss" href="./themes/default.css" rel="stylesheet" title="Default">
-    <link id="nobg-ss" href="./themes/nobg.css" rel="alternate stylesheet" title="No BG">
-    <link id="regexpal-ss" href="./themes/regexpal.css" rel="alternate stylesheet" title="RegexPal">
-    <link id="regexbuddy-ss" href="./themes/regexbuddy.css" rel="alternate stylesheet" title="RegexBuddy">
+  <link id="default-ss" href="themes/default.css" rel="stylesheet" title="Default">
+  <link id="nobg-ss" href="themes/nobg.css" rel="alternate stylesheet" title="No BG">
+  <link id="regexpal-ss" href="themes/regexpal.css" rel="alternate stylesheet" title="RegexPal">
+  <link id="regexbuddy-ss" href="themes/regexbuddy.css" rel="alternate stylesheet" title="RegexBuddy">
 
-    <style>
-        body {
-            font-family: Calibri, Verdana, Sans-serif;
-            padding: 0 30px 15px 30px;
-            margin: 0;
-        }
-        h1, h2, h3 {
-            font-family: Cambria;
-        }
-        pre.regex {
-            font-family: Consolas, "Courier New", Monospace;
-            border: 1px solid #ddd;
-            display: inline-block;
-            padding: 2px;
-            margin: 0;
-        }
-    </style>
+  <style>
+    body {
+      font-family: Calibri, Verdana, Sans-serif;
+      padding: 0 30px 15px 30px;
+      margin: 0;
+    }
+    h1, h2, h3 {
+      font-family: Cambria;
+    }
+    pre.regex {
+      font-family: Consolas, "Courier New", Monospace;
+      border: 1px solid #ddd;
+      display: inline-block;
+      padding: 2px;
+      margin: 0;
+    }
+  </style>
 </head>
 <body>
-    <h1>Regex Colorizer</h1>
+  <h1>Regex Colorizer</h1>
 
-    <h2>Examples</h2>
+  <p>Currently supports only ES5 (with web reality) regex syntax.</p>
 
-    <h3>SSN</h3>
-    <pre class="regex">^(?!000|666)(?:[0-6]\d{2}|7(?:[0-6]\d|7[012]))-(?!00)\d{2}-(?!0000)\d{4}$</pre>
+  <h2>Examples</h2>
 
-    <h3>ZIP codes</h3>
-    <pre class="regex">\b[0-9]{5}(?:-[0-9]{4})?\b</pre>
+  <h3>SSN</h3>
 
-    <h3>Regex with errors</h3>
-    <pre class="regex">Hello+?? x*+ |? a{1,2}b{2,1} ||(?:a|b)* (?=x)* (?&lt;=n) (((((((a)))b.c)d|x(y)z{65536,}))))
+  <pre class="regex">^(?!000|666)(?:[0-6]\d{2}|7(?:[0-6]\d|7[012]))-(?!00)\d{2}-(?!0000)\d{4}$</pre>
+
+  <h3>ZIP codes</h3>
+
+  <pre class="regex">\b[0-9]{5}(?:-[0-9]{4})?\b</pre>
+
+  <h3>Regex with errors</h3>
+
+  <pre class="regex">Hello+?? x*+ |? a{1,2}b{2,1} ||(?:a|b)* (?=x)* (?&lt;=n) (((((((a)))b.c)d|x(y)z{65536,}))))
 [1-59-6\b-\cX.a-\w!---] \xFF \x \uFF\uFFFF\z\v\\\</pre>
 
-    <h2>Themes</h2>
+  <h2>Themes</h2>
 
-    <button onclick="setTheme('default')">Default</button>
-    <button onclick="setTheme('nobg')">No BG</button>
-    <button onclick="setTheme('regexpal')">RegexPal</button>
-    <button onclick="setTheme('regexbuddy')">RegexBuddy</button>
+  <button onclick="setTheme('default')">Default</button>
+  <button onclick="setTheme('nobg')">No BG</button>
+  <button onclick="setTheme('regexpal')">RegexPal</button>
+  <button onclick="setTheme('regexbuddy')">RegexBuddy</button>
 
-    <script src="./regex-colorizer.js"></script>
-    <script>
-        RegexColorizer.colorizeAll();
+  <script src="regex-colorizer.js"></script>
+  <script>
+    RegexColorizer.colorizeAll();
 
-        function setTheme(name) {
-            var sheets = document.getElementsByTagName("link"), i;
-            for (i = 0; i < sheets.length; i++) {
-                sheets[i].disabled = true;
-            }
-            document.getElementById(name + "-ss").disabled = false;
-        }
-    </script>
+    function setTheme(name) {
+      // Need to disable all before enabling active stylesheet
+      document.querySelectorAll('link').forEach(el => el.disabled = true);
+      document.getElementById(`${name}-ss`).disabled = false;
+    }
+  </script>
 </body>
 </html>
