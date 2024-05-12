@@ -246,7 +246,6 @@ const RegexColorizer = (() => {
 
   /**
    * Returns HTML for displaying the given regex with syntax highlighting.
-   * Put it in a <pre> tag to preserve line breaks.
    *
    * @param {string} pattern Regex pattern to be colorized.
    * @returns {string}
