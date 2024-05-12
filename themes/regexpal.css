@@ -1,6 +1,8 @@
 ﻿/* Regex Colorizer RegexPal theme */
 
-.regex       {font-family: Monospace;}
+.regex {
+  font-family: Consolas, "Source Code Pro", Monospace;
+}
 .regex b     {background: #aad1f7;} /* metasequence */
 .regex i     {background: #f9ca69;} /* char class */
 .regex i b   {background: #f7a700;} /* char class: metasequence */

@@ -488,7 +488,9 @@ const RegexColorizer = (() => {
     const ss = document.createElement('style');
     ss.id = 'regex-colorizer-ss';
     ss.textContent = `
-      .regex        {font-family: Monospace;}
+      .regex {
+        font-family: Consolas, "Source Code Pro", Monospace;
+      }
       .regex span   {background: #efefef;} /* escaped literal */
       .regex b      {background: #aad1f7;} /* metasequence */
       .regex i      {background: #e3e3e3;} /* char class */
