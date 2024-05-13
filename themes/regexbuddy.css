@@ -1,8 +1,9 @@
 /* Regex Colorizer RegexBuddy theme */
 
-.regex {
-  font-family: Consolas, "Source Code Pro", Monospace;
-}
+.regex   {font-family: Consolas, "Source Code Pro", Monospace;}
+.regex b {font-weight: normal;}
+.regex i {font-style: normal;}
+.regex u {text-decoration: none;}
 .regex b     {background: #80c0ff; color: #000080;} /* metasequence */
 .regex i     {background: #ffc080; color: #603000;} /* char class */
 .regex i b   {background: #e0a060; color: #302000;} /* char class: metasequence */
@@ -13,8 +14,3 @@
 .regex b.g4  {background: #808000; color: #ffffff;} /* group: depth 4 */
 .regex b.g5  {background: #00ff00; color: #000000;} /* group: depth 5 */
 .regex b.err {background: #ff0000; color: #ffffff;} /* error */
-.regex b, .regex i, .regex u {
-  font-weight: normal;
-  font-style: normal;
-  text-decoration: none;
-}

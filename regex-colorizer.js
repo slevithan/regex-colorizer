@@ -341,10 +341,11 @@ const RegexColorizer = (() => {
           let num = +m.slice(1);
           while (num > capturingGroupCount) {
             nonBackrefDigits = `${/\d$/.exec(num)[0]}${nonBackrefDigits}`;
-            num = Math.floor(num / 10); // Drop the last digit
+            // Drop the last digit
+            num = Math.floor(num / 10);
           }
           if (num > 0) {
-            output += `<b>\\${num}</b>${nonBackrefDigits}`;
+            output += `<b class="bref">\\${num}</b>${nonBackrefDigits}`;
           } else {
             const parts = /^\\([0-3][0-7]{0,2}|[4-7][0-7]?|[89])(\d*)/.exec(m);
             output += `<b>\\${parts[1]}</b>${parts[2]}`;
@@ -358,7 +359,7 @@ const RegexColorizer = (() => {
           // - If a named capture appears anywhere (before or after), treat as backreference
           // - Otherwise, it's a literal '\k<name>'
           // - In backreference mode, error if name doesn't appear in a capture (before or after)
-          output += `<b>${expandHtmlEntities(m)}</b>`;
+          output += `<b class="bref">${expandHtmlEntities(m)}</b>`;
           lastToken = {
             quantifiable: true,
           };
@@ -488,26 +489,23 @@ const RegexColorizer = (() => {
     const ss = document.createElement('style');
     ss.id = 'regex-colorizer-ss';
     ss.textContent = `
-      .regex {
-        font-family: Consolas, "Source Code Pro", Monospace;
-      }
-      .regex span   {background: #efefef;} /* escaped literal */
-      .regex b      {background: #aad1f7;} /* metasequence */
-      .regex i      {background: #e3e3e3;} /* char class */
-      .regex i span {background: #c3c3c3;} /* char class: boundaries */
-      .regex i b    {background: #c3c3c3;} /* char class: metasequence */
-      .regex i u    {background: #d3d3d3;} /* char class: range-hyphen */
-      .regex b.g1   {background: #b4fa50; color: #000;} /* group: depth 1 */
-      .regex b.g2   {background: #8cd400; color: #000;} /* group: depth 2 */
-      .regex b.g3   {background: #26b809; color: #fff;} /* group: depth 3 */
-      .regex b.g4   {background: #30ea60; color: #000;} /* group: depth 4 */
-      .regex b.g5   {background: #0c8d15; color: #fff;} /* group: depth 5 */
-      .regex b.err  {background: #e30000; color: #fff;} /* error */
-      .regex b, .regex i, .regex u {
-        font-weight: normal;
-        font-style: normal;
-        text-decoration: none;
-      }
+.regex   {font-family: Consolas, "Source Code Pro", Monospace;}
+.regex b {font-weight: normal;}
+.regex i {font-style: normal;}
+.regex u {text-decoration: none;}
+.regex span   {background: #f0f0f0;} /* escaped literal */
+.regex b      {background: #aad1f7;} /* metasequence */
+.regex b.bref {background: #cde6ff;} /* backreference */
+.regex i      {background: #e3e3e3;} /* char class */
+.regex i span {background: #c3c3c3;} /* char class: boundaries */
+.regex i b    {background: #c3c3c3;} /* char class: metasequence */
+.regex i u    {background: #d3d3d3;} /* char class: range-hyphen */
+.regex b.g1   {background: #b4fa50; color: #000;} /* group: depth 1 */
+.regex b.g2   {background: #8cd400; color: #000;} /* group: depth 2 */
+.regex b.g3   {background: #26b809; color: #fff;} /* group: depth 3 */
+.regex b.g4   {background: #30ea60; color: #000;} /* group: depth 4 */
+.regex b.g5   {background: #0c8d15; color: #fff;} /* group: depth 5 */
+.regex b.err  {background: #e30000; color: #fff;} /* error */
     `;
     document.querySelector('head').appendChild(ss);
   };

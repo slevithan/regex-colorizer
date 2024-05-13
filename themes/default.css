@@ -1,10 +1,12 @@
 /* Regex Colorizer default theme */
 
-.regex {
-  font-family: Consolas, "Source Code Pro", Monospace;
-}
-.regex span   {background: #efefef;} /* escaped literal */
+.regex   {font-family: Consolas, "Source Code Pro", Monospace;}
+.regex b {font-weight: normal;}
+.regex i {font-style: normal;}
+.regex u {text-decoration: none;}
+.regex span   {background: #f0f0f0;} /* escaped literal */
 .regex b      {background: #aad1f7;} /* metasequence */
+.regex b.bref {background: #cde6ff;} /* backreference */
 .regex i      {background: #e3e3e3;} /* char class */
 .regex i span {background: #c3c3c3;} /* char class: boundaries */
 .regex i b    {background: #c3c3c3;} /* char class: metasequence */
@@ -15,8 +17,3 @@
 .regex b.g4   {background: #30ea60; color: #000;} /* group: depth 4 */
 .regex b.g5   {background: #0c8d15; color: #fff;} /* group: depth 5 */
 .regex b.err  {background: #e30000; color: #fff;} /* error */
-.regex b, .regex i, .regex u {
-  font-weight: normal;
-  font-style: normal;
-  text-decoration: none;
-}
