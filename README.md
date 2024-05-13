@@ -13,3 +13,5 @@ RegexColorizer.colorizeAll();
 ```
 
 There is also a `RegexColorizer.colorizeText()` method that returns HTML with highlighting for the provided regex pattern string.
+
+Try the [demo](https://slevithan.github.io/regex-colorizer/demo/).
