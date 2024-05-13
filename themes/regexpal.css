@@ -1,16 +1,25 @@
-﻿/* Regex Colorizer RegexPal theme */
+﻿/* Regex Colorizer: RegexPal theme */
 
-.regex   {font-family: Consolas, "Source Code Pro", Monospace;}
+.regex {font-family: Consolas, "Source Code Pro", Monospace; color: #000;}
 .regex b {font-weight: normal;}
 .regex i {font-style: normal;}
 .regex u {text-decoration: none;}
-.regex b     {background: #aad1f7;} /* metasequence */
-.regex i     {background: #f9ca69;} /* char class */
-.regex i b   {background: #f7a700;} /* char class: metasequence */
-.regex i u   {background: #efba4a;} /* char class: range-hyphen */
-.regex b.g1  {background: #d2f854;} /* group: depth 1 */
-.regex b.g2  {background: #9ec70c;} /* group: depth 2 */
-.regex b.g3  {background: #ecc9f7;} /* group: depth 3 */
-.regex b.g4  {background: #54b70b;} /* group: depth 4 */
-.regex b.g5  {background: #b688cf;} /* group: depth 5 */
-.regex b.err {background: #ff4300;} /* error */
+
+/* metasequence */
+.regex b {background: #aad1f7;}
+/* error */
+.regex b.err {background: #ff4300;}
+
+/* char class */
+.regex i {background: #f9ca69;}
+/* char class: metasequence */
+.regex i b {background: #f7a700;}
+/* char class: range-hyphen */
+.regex i u {background: #efba4a;}
+
+/* group: depth */
+.regex b.g1 {background: #d2f854;}
+.regex b.g2 {background: #9ec70c;}
+.regex b.g3 {background: #ecc9f7;}
+.regex b.g4 {background: #54b70b;}
+.regex b.g5 {background: #b688cf;}

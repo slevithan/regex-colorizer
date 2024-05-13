@@ -1,16 +1,23 @@
-/* Regex Colorizer RegexBuddy theme */
+/* Regex Colorizer: RegexBuddy theme */
 
-.regex   {font-family: Consolas, "Source Code Pro", Monospace;}
+.regex {font-family: Consolas, "Source Code Pro", Monospace; color: #000;}
 .regex b {font-weight: normal;}
 .regex i {font-style: normal;}
 .regex u {text-decoration: none;}
-.regex b     {background: #80c0ff; color: #000080;} /* metasequence */
-.regex i     {background: #ffc080; color: #603000;} /* char class */
-.regex i b   {background: #e0a060; color: #302000;} /* char class: metasequence */
-.regex i u   {background: #ffc080; color: #603000;} /* char class: range-hyphen */
-.regex b.g1  {background: #00c000; color: #ffffff;} /* group: depth 1 */
-.regex b.g2  {background: #c0c000; color: #000000;} /* group: depth 2 */
-.regex b.g3  {background: #008000; color: #ffffff;} /* group: depth 3 */
-.regex b.g4  {background: #808000; color: #ffffff;} /* group: depth 4 */
-.regex b.g5  {background: #00ff00; color: #000000;} /* group: depth 5 */
-.regex b.err {background: #ff0000; color: #ffffff;} /* error */
+
+/* metasequence */
+.regex b {background: #80c0ff; color: #000080;}
+/* error */
+.regex b.err {background: #ff0000; color: #fff;}
+
+/* char class */
+.regex i {background: #ffc080; color: #603000;}
+/* char class: metasequence */
+.regex i b {background: #e0a060; color: #302000;}
+
+/* group: depth */
+.regex b.g1 {background: #00c000; color: #fff;}
+.regex b.g2 {background: #c0c000;}
+.regex b.g3 {background: #008000; color: #fff;}
+.regex b.g4 {background: #808000; color: #fff;}
+.regex b.g5 {background: #0f0;}

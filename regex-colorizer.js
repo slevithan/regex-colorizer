@@ -65,7 +65,7 @@ const RegexColorizer = (() => {
   }
 
   /**
-   * Expands & and < characters in the provided string to HTML entities &amp; and &lt;.
+   * Converts special characters to HTML entities.
    *
    * @param {string} str String with characters to expand.
    * @returns {string} String with characters expanded.
@@ -75,10 +75,10 @@ const RegexColorizer = (() => {
   }
 
   /**
-   * Collapses HTML entities &amp; and &lt; in the provided string to & and <.
+   * Converts HTML entities to literal characters.
    *
-   * @param {string} str String with characters to collapse.
-   * @returns {string} String with characters collapsed.
+   * @param {string} str String with entities to collapse.
+   * @returns {string} String with entities collapsed.
    */
   function collapseHtmlEntities(str) {
     return str.replace(/&amp;/g, '&').replace(/&lt;/g, '<');
@@ -133,8 +133,8 @@ const RegexColorizer = (() => {
 
   /**
    * Returns HTML for displaying the given character class with syntax highlighting.
-   * Character classes have their own syntax rules which are different (sometimes quite subtly)
-   * from surrounding regex syntax. Hence, they're treated as a single token and parsed separately.
+   * Character classes have their own syntax rules which are different (sometimes subtly) from
+   * surrounding regex syntax. Hence, they're treated as a single token and parsed separately.
    *
    * @param {string} value Character class pattern to be colorized.
    * @returns {string}
@@ -154,15 +154,15 @@ const RegexColorizer = (() => {
       // Escape
       if (m.charAt(0) === '\\') {
         // Inside character classes, browsers differ on how they handle the following:
-        // - Any representation of character index zero (\0, \00, \000, \x00, \u0000).
-        // - '\c', when not followed by A-Z or a-z.
-        // - '\x', when not followed by two hex characters.
-        // - '\u', when not followed by four hex characters.
-        // However, although representations of character index zero within character
-        // classes don't work on their own in old Firefox, they don't throw an error, they work
-        // when used with ranges, and it's highly unlikely that the user will actually have
-        // such a character in their test data, so such tokens are highlighted normally.
-        // The remaining metasequences are flagged as errors.
+        // - Any representation of character index zero (\0, \00, \000, \x00, \u0000)
+        // - '\c', when not followed by A-Z or a-z
+        // - '\x', when not followed by two hex characters
+        // - '\u', when not followed by four hex characters
+        // However, although representations of character index zero within character classes don't
+        // work on their own in old Firefox, they don't throw an error, they work when used with
+        // ranges, and it's highly unlikely that the user will actually have such a character in
+        // their test data, so such tokens are highlighted normally. The remaining metasequences
+        // are flagged as errors
         if (/^\\[cux]$/.test(m)) {
           output += errorize(m, error.INCOMPLETE_TOKEN);
           lastToken = {
@@ -171,10 +171,10 @@ const RegexColorizer = (() => {
         // Shorthand class (matches more than one character index)
         } else if (/^\\[dsw]$/i.test(m)) {
           output += `<b>${m}</b>`;
-          // Traditional regex behavior is that a shorthand class should be unrangeable.
-          // Hence, [-\dz], [\d-z], and [z-\d] should all be equivalent. However, at
-          // least some browsers handle this inconsistently. E.g., Firefox 2 throws an
-          // invalid range error for [z-\d] and [\d--].
+          // Traditional regex behavior is that a shorthand class should be unrangeable. Hence,
+          // [-\dz], [\d-z], and [z-\d] should all be equivalent. However, at least some browsers
+          // handle this inconsistently. E.g., Firefox 2 throws an invalid range error for [z-\d]
+          // and [\d--]
           lastToken = {
             rangeable: lastToken.type !== type.RANGE_HYPHEN,
             type: type.SHORT_CLASS,
@@ -285,8 +285,8 @@ const RegexColorizer = (() => {
         };
       // Group opening
       } else if (char0 === '(') {
-        // If this is an invalid group type, mark the error and don't count it towards
-        // group depth or total count
+        // If this is an invalid group type, mark the error and don't count it toward group depth
+        // or total count
         if (m.length === 2) { // m is '(?'
           output += errorize(m, error.INVALID_GROUP_TYPE);
         } else {
@@ -295,10 +295,9 @@ const RegexColorizer = (() => {
             capturingGroupCount++;
           }
           groupStyleDepth = groupStyleDepth === 5 ? 1 : groupStyleDepth + 1;
-          // Record the group opening's position and character sequence so we can later
-          // mark it as invalid if it turns out to be unclosed in the remainder of the
-          // regex. The value of index is the position plus the length of the opening <b>
-          // element with group-depth class.
+          // Record the group opening's position and value so we can mark it later as invalid if it
+          // turns out to be unclosed in the remainder of the regex. The value of index is the
+          // position plus the length of the opening <b> element with a group-depth class
           openGroups.push({
             index: output.length + '<b class="gN">'.length,
             opening: expandHtmlEntities(m),
@@ -321,7 +320,7 @@ const RegexColorizer = (() => {
           output += groupize(')', groupStyleDepth);
           // Although it's possible to quantify lookarounds, this adds no value, doesn't work as
           // you'd expect in JavaScript, and is an error with flag u or v (and in some other regex
-          // flavors such as PCRE), so flag them as unquantifiable.
+          // flavors such as PCRE), so flag them as unquantifiable
           lastToken = {
             quantifiable: !/^\(\?<?[=!]/.test(collapseHtmlEntities(openGroups[openGroups.length - 1].opening)),
             style: `g${groupStyleDepth}`,
@@ -335,17 +334,16 @@ const RegexColorizer = (() => {
         // Backreference or octal character code without a leading zero
         if (/^[1-9]/.test(char1)) {
           // What does '\10' mean?
-          // - Backref 10, if 10 or more capturing groups opened before this point.
-          // - Backref 1 followed by '0', if 1-9 capturing groups opened before this point.
-          // - Otherwise, it's octal character index 10 (since 10 is in octal range 0-377).
-          // In the case of \8 or \9 when as many capturing groups weren't opened before
-          // this point, they're highlighted as special tokens. However, they should
-          // probably be marked as errors since the handling is browser-specific. E.g.,
-          // in Firefox 2 they seem to be equivalent to '(?!)', while in IE 7 they match
-          // the literal characters '8' and '9', which is correct handling. I don't mark
-          // them as errors because it would seem inconsistent to users who don't
-          // understand the highlighting rules for octals, etc. In fact, octals are not
-          // included in ES3, but all the big browsers support them.
+          // - Backref 10, if 10 or more capturing groups opened before this point
+          // - Backref 1 followed by '0', if 1-9 capturing groups opened before this point
+          // - Otherwise, it's octal character index 10 (since 10 is in octal range 0-377)
+          // In the case of \8 or \9 when as many capturing groups weren't opened before this
+          // point, they're highlighted as special tokens. However, they should probably be marked
+          // as errors since the handling is browser-specific. E.g., in Firefox 2 they seem to be
+          // equivalent to '(?!)', while in IE 7 they match the literal characters '8' and '9',
+          // which is correct handling. I don't mark them as errors because it would seem
+          // inconsistent to users who don't understand the highlighting rules for octals, etc. In
+          // fact, octals are not included in ES3, but browsers support them for backcompat
           let nonBackrefDigits = '';
           let num = +m.slice(1);
           while (num > capturingGroupCount) {
@@ -375,10 +373,10 @@ const RegexColorizer = (() => {
         // Metasequence
         } else if (/^[0bBcdDfnrsStuvwWx]/.test(char1)) {
           // Browsers differ on how they handle:
-          // - '\c', when not followed by A-Z or a-z.
-          // - '\x', when not followed by two hex characters.
-          // - '\u', when not followed by four hex characters.
-          // Hence, such metasequences are flagged as errors.
+          // - '\c', when not followed by A-Z or a-z
+          // - '\x', when not followed by two hex characters
+          // - '\u', when not followed by four hex characters
+          // Hence, such metasequences are flagged as errors
           if (/^\\[cux]$/.test(m)) {
             output += errorize(m, error.INCOMPLETE_TOKEN);
             lastToken = {
@@ -430,9 +428,9 @@ const RegexColorizer = (() => {
         };
       // Vertical bar (alternator)
       } else if (m === '|') {
-        // If there is a vertical bar at the very start of the regex, flag it as an error
-        // since it effectively truncates the regex at that point. If two top-level
-        // vertical bars are next to each other, flag it as an error for similar reasons.
+        // If there is a vertical bar at the very start of the regex, flag it as an error since it
+        // effectively truncates the regex at that point. If two top-level vertical bars are next
+        // to each other, flag it as an error for the same reason
         if (lastToken.type === type.NONE || (lastToken.type === type.ALTERNATOR && !openGroups.length)) {
           output += errorize(m, error.IMPROPER_EMPTY_ALTERNATIVE);
         } else {
@@ -497,24 +495,26 @@ const RegexColorizer = (() => {
   self.addStyleSheet = () => {
     const ss = document.createElement('style');
     ss.id = 'regex-colorizer-ss';
+    // See: themes/default.css
     ss.textContent = `
-.regex   {font-family: Consolas, "Source Code Pro", Monospace;}
+.regex {font-family: Consolas, "Source Code Pro", Monospace; color: #000;}
 .regex b {font-weight: normal;}
 .regex i {font-style: normal;}
 .regex u {text-decoration: none;}
-.regex span   {background: #f0f0f0;} /* escaped literal */
-.regex b      {background: #aad1f7;} /* metasequence */
-.regex b.bref {background: #cde6ff;} /* backreference */
-.regex i      {background: #e3e3e3;} /* char class */
-.regex i span {background: #c3c3c3;} /* char class: boundaries */
-.regex i b    {background: #c3c3c3;} /* char class: metasequence */
-.regex i u    {background: #d3d3d3;} /* char class: range-hyphen */
-.regex b.g1   {background: #b4fa50; color: #000;} /* group: depth 1 */
-.regex b.g2   {background: #8cd400; color: #000;} /* group: depth 2 */
-.regex b.g3   {background: #26b809; color: #fff;} /* group: depth 3 */
-.regex b.g4   {background: #30ea60; color: #000;} /* group: depth 4 */
-.regex b.g5   {background: #0c8d15; color: #fff;} /* group: depth 5 */
-.regex b.err  {background: #e30000; color: #fff;} /* error */
+.regex * {border-radius: 0.2em;}
+.regex span {background: #f0f0f0;}
+.regex b {background: #80c0ff; color: #092e7f;}
+.regex b.bref {background: #95e1ff; color: #062f89;}
+.regex b.err {background: #e30000; color: #fff;}
+.regex i {background: #e3e3e3; font-style: italic;}
+.regex i span {background: #c3c3c3; font-style: normal;}
+.regex i b {background: #c3c3c3;}
+.regex i u {background: #d3d3d3;}
+.regex b.g1 {background: #b4fa50;}
+.regex b.g2 {background: #8cd400;}
+.regex b.g3 {background: #26b809; color: #fff;}
+.regex b.g4 {background: #30ea60;}
+.regex b.g5 {background: #0c8d15; color: #fff;}
     `;
     document.querySelector('head').appendChild(ss);
   };

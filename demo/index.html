@@ -24,6 +24,7 @@
     }
     pre, code {
       border: 1px solid #ddd;
+      border-radius: 0.375rem;
       display: inline-block;
       margin: 0;
     }
@@ -35,7 +36,9 @@
     }
     button {
       margin-right: 4px;
-      padding: 4px 8px;
+      padding: 6px 10px;
+      font-weight: bold;
+      border-radius: 0.4rem;
     }
     footer, footer a {
       color: #aaa;
@@ -52,13 +55,13 @@
 
   <ul>
     <li><strong>Current version:</strong> 0.4.0.</li>
-    <li><strong>Size:</strong> 3.4 KB min/gzip (no dependencies).</li>
+    <li><strong>Size:</strong> 3.5 KB min/gzip, with no dependencies.</li>
     <li><strong>License:</strong> <a href="https://mit-license.org/">MIT</a>.</li>
   </ul>
 
-  <p>Adds syntax highlighting to regular expressions for readability. Supports the JavaScript regex flavor, with extensions for web reality. Any regex features not supported by JavaScript are marked as errors, along with some edge cases that cause cross-browser grief. Syntax changes activated by flags <code>u</code> and <code>v</code> are not yet supported.</p>
+  <p>Adds syntax highlighting to regular expressions for readability. Supports the <strong>JavaScript regex flavor</strong>, with extensions for <strong>web reality</strong>. Unsupported regex features are marked as errors, along with some edge cases that can cause cross-browser grief. Syntax changes activated by flags <code>u</code> and <code>v</code> are not yet supported.</p>
 
-  <p>The API is simple: just give your regexes the class <code>regex</code>, call a couple functions (see below), and you're done. The syntax highlighting, however, is quite advanced. Errors are highlighted in red; hover over them for a description of the problem.</p>
+  <p>The API is simple. Just give elements that contain your regexes class <code>regex</code>, and call a couple functions (see below). The syntax highlighting, however, is quite advanced, and is contextually aware of things that happen forward or backward in the regex.</p>
 
   <h2>Examples</h2>
 
@@ -72,12 +75,15 @@
 
   <h3>Regex with errors</h3>
 
-  <pre class="regex">Oh h\i+?? x*+ |? a{1,2}b{2,1} ||(?:a|b)* (?&lt;=(?&lt;name>x))* (?>n) (((((((a)))b.c)d|x(y)z{65536,}))))
-[1-59-6\b-\cX.a-\w!---] \xFF \x \uFF\uFFFF\z\v\1\\\</pre>
+  <p>Errors are highlighted in red. Hover over them for a description of the problem.</p>
+
+  <pre class="regex">Oh h\i+?? x*+ |? a{1,2}b{2,1} ||(?:a|b)* (?&lt;=(?&lt;name>x))* (?>n)
+((((?:((a))b.c)d|x(y)z{65536,}))))
+[^1-59-6\b-\cX.a-\w!---] \xFF \x \uFF\uFFFF\z\v\1\\\</pre>
 
   <h2>Try it</h2>
 
-  <p><textarea id="input" rows="3" cols="82" placeholder="Type a regex pattern" spellcheck="false" oninput="colorizeInput()"></textarea></p>
+  <p><textarea id="input" rows="3" cols="70" placeholder="Type a regex pattern" spellcheck="false" oninput="colorizeInput()"></textarea></p>
 
   <pre id="output" class="regex">Type a regex pattern</pre>
 
@@ -109,7 +115,7 @@ RegexColorizer.colorizeAll();</pre>
     RegexColorizer.colorizeAll();
 
     function setTheme(name) {
-      // Need to disable all before enabling active stylesheet
+      // Need to disable all before enabling the active stylesheet
       document.querySelectorAll('link').forEach(el => el.disabled = true);
       document.getElementById(`${name}-ss`).disabled = false;
     }
