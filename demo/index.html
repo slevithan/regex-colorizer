@@ -64,8 +64,12 @@ RegexColorizer.colorizeAll();</pre>
     RegexColorizer.colorizeAll();
 
     function setTheme(name) {
-      // Need to disable all before enabling the active stylesheet
-      document.querySelectorAll('link').forEach(el => el.disabled = true);
+      document.querySelectorAll('link').forEach(el => {
+        if (el.id.endsWith('-ss')) {
+          // Need to disable all before enabling the active stylesheet, else it's unreliable
+          el.disabled = true;
+        }
+      });
       document.getElementById(`${name}-ss`).disabled = false;
     }
 
