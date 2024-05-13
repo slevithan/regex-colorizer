@@ -42,32 +42,25 @@ const RegexColorizer = (() => {
 // Private helper functions
 // ------------------------------------
 
-  /**
-   * Returns HTML for error highlighting.
-   *
-   * @param {string} str Pattern to apply error highlighting to.
-   * @param {string} desc Error description.
-   * @returns {string}
-   */
-  function toError(str, desc) {
-    return `<b class="err" title="${desc}">${str}</b>`;
-  }
-
-  /**
-   * Returns HTML for group highlighting.
-   *
-   * @param {string} str Pattern to apply group highlighting to.
-   * @param {number} depth Group nesting depth (1-5).
-   * @returns {string}
-   */
-  function toGroup(str, depth) {
-    return `<b class="g${depth}">${str}</b>`;
-  }
-  const groupOpeningTagLength = '<b class="gN">'.length;
+  const to = {
+    // Depth is 0-5
+    alternator: (s, depth) => `<b${depth ? ` class="g${depth}"` : ''}>${s}</b>`,
+    backref: s => `<b class="bref">${s}</b>`,
+    charClass: s => `<i>${s}</i>`,
+    charClassBoundary: s => `<span>${s}</span>`,
+    error: (s, desc) => `<b class="err" title="${desc}">${s}</b>`,
+    escapedLiteral: s => `<span>${s}</span>`,
+    // Depth is 1-5
+    group: (s, depth) => `<b class="g${depth}">${s}</b>`,
+    metasequence: s => `<b>${s}</b>`,
+    // Depth is 0-5
+    quantifier: (s, depth) => `<b${depth ? ` class="g${depth}"` : ''}>${s}</b>`,
+    range: s => `<u>${s}</u>`,
+  };
+  to.group.openingTagLength = '<b class="gN">'.length;
 
   /**
    * Converts special characters to HTML entities.
-   *
    * @param {string} str String with characters to expand.
    * @returns {string} String with characters expanded.
    */
@@ -77,7 +70,6 @@ const RegexColorizer = (() => {
 
   /**
    * Converts HTML entities to literal characters.
-   *
    * @param {string} str String with entities to collapse.
    * @returns {string} String with entities collapsed.
    */
@@ -88,7 +80,6 @@ const RegexColorizer = (() => {
   /**
    * Returns the character code for the provided regex token. Supports tokens used within character
    * classes only, since that's all it's currently needed for.
-   *
    * @param {string} token Regex token.
    * @returns {number} Character code of the provided token, or NaN.
    */
@@ -136,7 +127,6 @@ const RegexColorizer = (() => {
    * Returns HTML for displaying the given character class with syntax highlighting.
    * Character classes have their own syntax rules which are different (sometimes subtly) from
    * surrounding regex syntax. Hence, they're treated as a single token and parsed separately.
-   *
    * @param {string} value Character class pattern to be colorized.
    * @returns {string}
    */
@@ -165,13 +155,13 @@ const RegexColorizer = (() => {
         // their test data, so such tokens are highlighted normally. The remaining metasequences
         // are flagged as errors
         if (/^\\[cux]$/.test(m)) {
-          output += toError(m, error.INCOMPLETE_TOKEN);
+          output += to.error(m, error.INCOMPLETE_TOKEN);
           lastToken = {
             rangeable: lastToken.type !== type.RANGE_HYPHEN,
           };
         // Shorthand class (matches more than one character index)
         } else if (/^\\[dsw]$/i.test(m)) {
-          output += `<b>${m}</b>`;
+          output += to.metasequence(m);
           // Traditional regex behavior is that a shorthand class should be unrangeable. Hence,
           // [-\dz], [\d-z], and [z-\d] should all be equivalent. However, at least some browsers
           // handle this inconsistently. E.g., Firefox 2 throws an invalid range error for [z-\d]
@@ -182,11 +172,11 @@ const RegexColorizer = (() => {
           };
         // Unescaped '\' at the end of the regex
         } else if (m === '\\') {
-          output += toError(m, error.INCOMPLETE_TOKEN);
+          output += to.error(m, error.INCOMPLETE_TOKEN);
           // Don't need to set lastToken since this is the end of the line
         // Metasequence representing a single character index, or escaped literal character
         } else {
-          output += `<b>${expandEntities(m)}</b>`;
+          output += to.metasequence(expandEntities(m));
           lastToken = {
             rangeable: lastToken.type !== type.RANGE_HYPHEN,
             charCode: getTokenCharCode(m),
@@ -208,10 +198,10 @@ const RegexColorizer = (() => {
               lastToken.type === type.SHORT_CLASS ||
               /^\\[dsw]$/i.test(nextToken[0])
             ) {
-              output += toError('-', error.INVALID_RANGE);
+              output += to.error('-', error.INVALID_RANGE);
             // Hyphen creating a valid range
             } else {
-              output += '<u>-</u>';
+              output += to.range('-');
             }
             lastToken = {
               rangeable: false,
@@ -224,7 +214,7 @@ const RegexColorizer = (() => {
               output += '-';
             // Hyphen at the end of an unclosed character class (i.e., the end of the regex)
             } else {
-              output += '<u>-</u>';
+              output += to.range('-');
             }
           }
         // Hyphen at the beginning of a character class or after a non-rangeable token
@@ -245,9 +235,9 @@ const RegexColorizer = (() => {
     }
 
     if (closing) {
-      output = `<span>${opening}</span>${output}<span>${closing}</span>`;
+      output = to.charClassBoundary(opening) + output + to.charClassBoundary(closing);
     } else {
-      output = toError(opening, error.UNCLOSED_CLASS) + output;
+      output = to.error(opening, error.UNCLOSED_CLASS) + output;
     }
     return output;
   }
@@ -258,7 +248,6 @@ const RegexColorizer = (() => {
 
   /**
    * Returns HTML for displaying the given regex with syntax highlighting.
-   *
    * @param {string} pattern Regex pattern to be colorized.
    * @returns {string}
    */
@@ -280,7 +269,7 @@ const RegexColorizer = (() => {
       const char1 = m.charAt(1);
       // Character class
       if (char0 === '[') {
-        output += `<i>${parseCharClass(m)}</i>`;
+        output += to.charClass(parseCharClass(m));
         lastToken = {
           quantifiable: true,
         };
@@ -289,7 +278,7 @@ const RegexColorizer = (() => {
         // If this is an invalid group type, mark the error and don't count it toward group depth
         // or total count
         if (m.length === 2) { // m is '(?'
-          output += toError(m, error.INVALID_GROUP_TYPE);
+          output += to.error(m, error.INVALID_GROUP_TYPE);
         } else {
           // TODO: Capture names must be unique
           if (m.length === 1 || /^\(\?<[a-z_]/i.test(m)) {
@@ -297,14 +286,13 @@ const RegexColorizer = (() => {
           }
           groupStyleDepth = groupStyleDepth === 5 ? 1 : groupStyleDepth + 1;
           // Record the group opening's position and value so we can mark it later as invalid if it
-          // turns out to be unclosed in the remainder of the regex. The value of index is the
-          // position plus the length of the opening <b> element with a group-depth class
+          // turns out to be unclosed in the remainder of the regex
           openGroups.push({
-            index: output.length + groupOpeningTagLength,
+            index: output.length + to.group.openingTagLength,
             opening: expandEntities(m),
           });
           // Add markup to the group-opening character sequence
-          output += toGroup(expandEntities(m), groupStyleDepth);
+          output += to.group(expandEntities(m), groupStyleDepth);
         }
         lastToken = {
           quantifiable: false,
@@ -313,18 +301,18 @@ const RegexColorizer = (() => {
       } else if (char0 === ')') {
         // If this is an invalid group closing
         if (!openGroups.length) {
-          output += toError(')', error.UNBALANCED_RIGHT_PAREN);
+          output += to.error(')', error.UNBALANCED_RIGHT_PAREN);
           lastToken = {
             quantifiable: false,
           };
         } else {
-          output += toGroup(')', groupStyleDepth);
+          output += to.group(')', groupStyleDepth);
           // Although it's possible to quantify lookarounds, this adds no value, doesn't work as
           // you'd expect in JavaScript, and is an error with flag u or v (and in some other regex
           // flavors such as PCRE), so flag them as unquantifiable
           lastToken = {
             quantifiable: !/^\(\?<?[=!]/.test(collapseEntities(openGroups[openGroups.length - 1].opening)),
-            style: `g${groupStyleDepth}`,
+            groupStyleDepth,
           };
           groupStyleDepth = groupStyleDepth === 1 ? 5 : groupStyleDepth - 1;
           // Drop the last opening paren from depth tracking
@@ -353,10 +341,10 @@ const RegexColorizer = (() => {
             num = Math.floor(num / 10);
           }
           if (num > 0) {
-            output += `<b class="bref">\\${num}</b>${nonBackrefDigits}`;
+            output += `${to.backref(`\\${num}`)}${nonBackrefDigits}`;
           } else {
             const parts = /^\\([0-3][0-7]{0,2}|[4-7][0-7]?|[89])(\d*)/.exec(m);
-            output += `<b>\\${parts[1]}</b>${parts[2]}`;
+            output += `${to.metasequence(`\\${parts[1]}`)}${parts[2]}`;
           }
           lastToken = {
             quantifiable: true,
@@ -367,7 +355,7 @@ const RegexColorizer = (() => {
           // - If a named capture appears anywhere (before or after), treat as backreference
           // - Otherwise, it's a literal '\k<name>'
           // - In backreference mode, error if name doesn't appear in a capture (before or after)
-          output += `<b class="bref">${expandEntities(m)}</b>`;
+          output += to.backref(expandEntities(m));
           lastToken = {
             quantifiable: true,
           };
@@ -379,30 +367,30 @@ const RegexColorizer = (() => {
           // - '\u', when not followed by four hex characters
           // Hence, such metasequences are flagged as errors
           if (/^\\[cux]$/.test(m)) {
-            output += toError(m, error.INCOMPLETE_TOKEN);
+            output += to.error(m, error.INCOMPLETE_TOKEN);
             lastToken = {
               quantifiable: false,
             };
           // Unquantifiable metasequence
           } else if ('bB'.indexOf(char1) > -1) {
-            output += `<b>${m}</b>`;
+            output += to.metasequence(m);
             lastToken = {
               quantifiable: false,
             };
           // Quantifiable metasequence
           } else {
-            output += `<b>${m}</b>`;
+            output += to.metasequence(m);
             lastToken = {
               quantifiable: true,
             };
           }
         // Unescaped '\' at the end of the regex
         } else if (m === '\\') {
-          output += toError(m, error.INCOMPLETE_TOKEN);
+          output += to.error(m, error.INCOMPLETE_TOKEN);
           // Don't need to set lastToken since this is the end of the line
         // Escaped literal character
         } else {
-          output += `<span>${expandEntities(m)}</span>`;
+          output += to.escapedLiteral(expandEntities(m));
           lastToken = {
             quantifiable: true,
           };
@@ -413,16 +401,16 @@ const RegexColorizer = (() => {
           const interval = /^\{(\d+)(?:,(\d*))?/.exec(m);
           // Interval quantifier out of range for old Firefox
           if (interval && (+interval[1] > 65535 || (interval[2] && +interval[2] > 65535))) {
-            output += toError(m, error.INTERVAL_OVERFLOW);
+            output += to.error(m, error.INTERVAL_OVERFLOW);
           // Interval quantifier in reverse numeric order
           } else if (interval && interval[2] && (+interval[1] > +interval[2])) {
-            output += toError(m, error.INTERVAL_REVERSED);
+            output += to.error(m, error.INTERVAL_REVERSED);
           } else {
             // Quantifiers for groups are shown in the style of the (preceeding) group's depth
-            output += `<b${lastToken.style ? ` class="${lastToken.style}"` : ''}>${m}</b>`;
+            output += to.quantifier(m, lastToken.groupStyleDepth ?? 0);
           }
         } else {
-          output += toError(m, error.UNQUANTIFIABLE);
+          output += to.error(m, error.UNQUANTIFIABLE);
         }
         lastToken = {
           quantifiable: false,
@@ -433,10 +421,10 @@ const RegexColorizer = (() => {
         // effectively truncates the regex at that point. If two top-level vertical bars are next
         // to each other, flag it as an error for the same reason
         if (lastToken.type === type.NONE || (lastToken.type === type.ALTERNATOR && !openGroups.length)) {
-          output += toError(m, error.IMPROPER_EMPTY_ALTERNATIVE);
+          output += to.error(m, error.IMPROPER_EMPTY_ALTERNATIVE);
         } else {
           // Alternators within groups are shown in the style of the containing group's depth
-          output += openGroups.length ? toGroup('|', groupStyleDepth) : '<b>|</b>';
+          output += to.alternator(m, openGroups.length && groupStyleDepth);
         }
         lastToken = {
           quantifiable: false,
@@ -444,13 +432,13 @@ const RegexColorizer = (() => {
         };
       // ^ or $ anchor
       } else if (m === '^' || m === '$') {
-        output += `<b>${m}</b>`;
+        output += to.metasequence(m);
         lastToken = {
           quantifiable: false,
         };
       // Dot (.)
       } else if (m === '.') {
-        output += '<b>.</b>';
+        output += to.metasequence(m);
         lastToken = {
           quantifiable: true,
         };
@@ -469,10 +457,10 @@ const RegexColorizer = (() => {
       const errorIndex = openGroup.index + numCharsAdded;
       output = (
         output.slice(0, errorIndex) +
-        toError(openGroup.opening, error.UNBALANCED_LEFT_PAREN) +
+        to.error(openGroup.opening, error.UNBALANCED_LEFT_PAREN) +
         output.slice(errorIndex + openGroup.opening.length)
       );
-      numCharsAdded += toError('', error.UNBALANCED_LEFT_PAREN).length;
+      numCharsAdded += to.error('', error.UNBALANCED_LEFT_PAREN).length;
     }
 
     return output.replace(/\r?\n/g, '<br>');
@@ -480,7 +468,6 @@ const RegexColorizer = (() => {
 
   /**
    * Applies regex syntax highlighting to all elements on the page with the specified class.
-   *
    * @param {string} [cls='regex'] Class name used by elements to be colorized.
    */
   self.colorizeAll = cls => {
