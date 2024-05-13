@@ -4,9 +4,9 @@
  */
 
 // Adds syntax highlighting to regular expressions for readability. Supports the JavaScript regex
-// flavor, with extensions for web reality. Any regex features not supported by JavaScript are
-// marked as errors, along with some edge cases that cause cross-browser grief. Syntax changes
-// activated by flags `u` and `v` are not yet supported.
+// flavor, with extensions for web reality. Unsupported regex features are marked as errors, along
+// with some edge cases that can cause cross-browser grief. Syntax changes activated by flags `u`
+// and `v` are not yet supported.
 
 const RegexColorizer = (() => {
 

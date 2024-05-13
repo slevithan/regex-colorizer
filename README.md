@@ -1,8 +1,12 @@
 ﻿# Regex Colorizer 0.4
 
-Adds syntax highlighting to regular expressions for readability. Supports the JavaScript regex flavor, with extensions for web reality. Any regex features not supported by JavaScript are marked as errors, along with some edge cases that cause cross-browser grief. Syntax changes activated by flags `u` and `v` are not yet supported.
+Adds syntax highlighting to regular expressions for readability. Supports the **JavaScript regex flavor**, with extensions for **web reality**. Unsupported regex features are marked as errors, along with some edge cases that can cause cross-browser grief. Syntax changes activated by flags `u` and `v` are not yet supported.
 
-Use the following code to run Regex Colorizer for all elements on a page with class `regex`:
+The API is simple. Just give elements that contain your regexes class `regex`, and call a couple functions (see below). The syntax highlighting, however, is quite advanced, and is contextually aware of things that happen forward or backward in the regex.
+
+**Size:** 3.4 KB min/gzip, with no dependencies.
+
+## Usage
 
 ```js
 // Don't run this line if you provide your own stylesheet
@@ -12,6 +16,6 @@ RegexColorizer.addStyleSheet();
 RegexColorizer.colorizeAll();
 ```
 
-There is also a `RegexColorizer.colorizeText()` method that returns HTML with highlighting for the provided regex pattern string.
+There is also `RegexColorizer.colorizeText()` that returns HTML with highlighting for the provided regex pattern string.
 
 Try the [demo](https://slevithan.github.io/regex-colorizer/demo/).
