@@ -65,13 +65,23 @@ const RegexColorizer = (() => {
   }
 
   /**
-   * Expands &, <, and > characters in the provided string to HTML entities &amp;, &lt;, and &gt;.
+   * Expands & and < characters in the provided string to HTML entities &amp; and &lt;.
    *
    * @param {string} str String with characters to expand.
    * @returns {string} String with characters expanded.
    */
   function expandHtmlEntities(str) {
-    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  }
+
+  /**
+   * Collapses HTML entities &amp; and &lt; in the provided string to & and <.
+   *
+   * @param {string} str String with characters to collapse.
+   * @returns {string} String with characters collapsed.
+   */
+  function collapseHtmlEntities(str) {
+    return str.replace(/&amp;/g, '&').replace(/&lt;/g, '<');
   }
 
   /**
@@ -309,11 +319,11 @@ const RegexColorizer = (() => {
           };
         } else {
           output += groupize(')', groupStyleDepth);
-          // Although it's possible to quantify lookaheads, this adds no value, doesn't work as
+          // Although it's possible to quantify lookarounds, this adds no value, doesn't work as
           // you'd expect in JavaScript, and is an error with flag u or v (and in some other regex
           // flavors such as PCRE), so flag them as unquantifiable.
           lastToken = {
-            quantifiable: !/^[=!]/.test(openGroups[openGroups.length - 1].opening.charAt(2)),
+            quantifiable: !/^\(\?<?[=!]/.test(collapseHtmlEntities(openGroups[openGroups.length - 1].opening)),
             style: `g${groupStyleDepth}`,
           };
           groupStyleDepth = groupStyleDepth === 1 ? 5 : groupStyleDepth - 1;
