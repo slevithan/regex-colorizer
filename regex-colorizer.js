@@ -1,7 +1,6 @@
-/*! Regex Colorizer v0.3.1-next
+/*! Regex Colorizer 0.4
  * (c) 2010-2024 Steven Levithan
  * MIT license
- * <https://stevenlevithan.com/regex/colorizer/>
  */
 
 // Adds syntax highlighting to regular expressions for readability. Supports the JavaScript regex

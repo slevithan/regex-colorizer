@@ -1,4 +1,4 @@
-﻿# Regex Colorizer v0.3.1-next
+﻿# Regex Colorizer 0.4
 
 Adds syntax highlighting to regular expressions for readability. Supports the JavaScript regex flavor, with extensions for web reality. Any regex features not supported by JavaScript are marked as errors, along with some edge cases that cause cross-browser grief. Syntax changes activated by flags `u` and `v` are not yet supported.
 
@@ -13,5 +13,3 @@ RegexColorizer.colorizeAll();
 ```
 
 There is also a `RegexColorizer.colorizeText()` method that returns HTML with highlighting for the provided regex pattern string.
-
-See [Regex Colorizer's website](https://stevenlevithan.com/regex/colorizer/) for examples and more details.
