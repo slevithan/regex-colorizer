@@ -42,13 +42,14 @@ const RegexColorizer = (() => {
 // Private helper functions
 // ------------------------------------
 
+  // HTML generation functions for regex syntax parts
   const to = {
     // Depth is 0-5
     alternator: (s, depth) => `<b${depth ? ` class="g${depth}"` : ''}>${s}</b>`,
     backref: s => `<b class="bref">${s}</b>`,
     charClass: s => `<i>${s}</i>`,
     charClassBoundary: s => `<span>${s}</span>`,
-    error: (s, desc) => `<b class="err" title="${desc}">${s}</b>`,
+    error: (s, msg) => `<b class="err" title="${msg}">${s}</b>`,
     escapedLiteral: s => `<span>${s}</span>`,
     // Depth is 1-5
     group: (s, depth) => `<b class="g${depth}">${s}</b>`,
@@ -326,13 +327,11 @@ const RegexColorizer = (() => {
           // - Backref 10, if 10 or more capturing groups opened before this point
           // - Backref 1 followed by '0', if 1-9 capturing groups opened before this point
           // - Otherwise, it's octal character index 10 (since 10 is in octal range 0-377)
-          // In the case of \8 or \9 when as many capturing groups weren't opened before this
-          // point, they're highlighted as special tokens. However, they should probably be marked
-          // as errors since the handling is browser-specific. E.g., in Firefox 2 they seem to be
-          // equivalent to '(?!)', while in IE 7 they match the literal characters '8' and '9',
-          // which is correct handling. I don't mark them as errors because it would seem
-          // inconsistent to users who don't understand the highlighting rules for octals, etc. In
-          // fact, octals are not included in ES3, but browsers support them for backcompat
+          // In fact, octals are not included in ES3, but browsers support them for backcompat.
+          // With flag u or v (not yet supported), the rules change significantly:
+          // - Escaped digits must be a backref or \0 and can't be immediately followed by digits
+          // - An escaped number is a valid backreference if it is not in a character class and
+          //   there are as many capturing groups anywhere in the pattern (before or after)
           let nonBackrefDigits = '';
           let num = +m.slice(1);
           while (num > capturingGroupCount) {
@@ -343,8 +342,17 @@ const RegexColorizer = (() => {
           if (num > 0) {
             output += `${to.backref(`\\${num}`)}${nonBackrefDigits}`;
           } else {
-            const parts = /^\\([0-3][0-7]{0,2}|[4-7][0-7]?|[89])(\d*)/.exec(m);
-            output += `${to.metasequence(`\\${parts[1]}`)}${parts[2]}`;
+            const {escapedNum, escapedLiteral, literal} =
+              /^\\(?<escapedNum>[0-3][0-7]{0,2}|[4-7][0-7]?|(?<escapedLiteral>[89]))(?<literal>\d*)/.exec(m).groups;
+            if (escapedLiteral) {
+              // For \8 and \9 (escaped non-octal digits) when as many capturing groups weren't
+              // opened before this point, they match '8' and '9' (when not using flag u or v).
+              // However, they could be marked as errors since some old browsers handled them
+              // differently (in Firefox 2, they seemed to be equivalent to `(?!)`)
+              output += `${to.escapedLiteral(`\\${escapedLiteral}`)}${literal}`;
+            } else {
+              output += `${to.metasequence(`\\${escapedNum}`)}${literal}`;
+            }
           }
           lastToken = {
             quantifiable: true,
