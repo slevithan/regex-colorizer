@@ -14,7 +14,7 @@ const RegexColorizer = (() => {
 // Private variables
 // ------------------------------------
 
-  const regexToken = /\[\^?(?:[^\\\]]+|\\.?)*]?|\\(?:0(?:[0-3][0-7]{0,2}|[4-7][0-7]?)?|[1-9]\d*|x[\dA-Fa-f]{2}|u[\dA-Fa-f]{4}|c[A-Za-z]|k<[A-Za-z_]\w*>|.?)|\((?:\?(?:<(?:[=!]|[A-Za-z_]\w*>)|[:=!]?))?|(?:[?*+]|\{\d+(?:,\d*)?\})\??|[^.?*+^${[()|\\]+|./gs;
+  const regexToken = /\[\^?(?:[^\\\]]+|\\.?)*]?|\\(?:0(?:[0-3][0-7]{0,2}|[4-7][0-7]?)?|[1-9]\d*|x[\dA-Fa-f]{2}|u[\dA-Fa-f]{4}|c[A-Za-z]|k<[A-Za-z_]\w*>|.?)|\((?:\?(?:<(?:[=!]|(?<captureName>[A-Za-z_]\w*)>)|[:=!]?))?|(?:[?*+]|\{\d+(?:,\d*)?\})\??|[^.?*+^${[()|\\]+|./gs;
   const charClassToken = /[^\\-]+|-|\\(?:[0-3][0-7]{0,2}|[4-7][0-7]?|x[\dA-Fa-f]{2}|u[\dA-Fa-f]{4}|c[A-Za-z]|.?)/gs;
   const charClassParts = /^(?<opening>\[\^?)(?<content>(?:[^\\\]]+|\\.?)*)(?<closing>]?)$/s;
   const quantifier = /^(?:[?*+]|\{\d+(?:,\d*)?\})\??$/;
@@ -25,6 +25,7 @@ const RegexColorizer = (() => {
       ALTERNATOR: 3,
   };
   const error = {
+    DUPLICATE_CAPTURE_NAME: 'Duplicate capture name',
     UNCLOSED_CLASS: 'Unclosed character class',
     INCOMPLETE_TOKEN: 'Incomplete regex token',
     INVALID_RANGE: 'Reversed or invalid range',
@@ -257,6 +258,7 @@ const RegexColorizer = (() => {
     let capturingGroupCount = 0;
     let groupStyleDepth = 0;
     const openGroups = [];
+    const captureNames = new Set();
     let lastToken = {
       quantifiable: false,
       type: type.NONE,
@@ -268,6 +270,7 @@ const RegexColorizer = (() => {
       const m = match[0];
       const char0 = m.charAt(0);
       const char1 = m.charAt(1);
+      const captureName = match.groups.captureName;
       // Character class
       if (char0 === '[') {
         output += to.charClass(parseCharClass(m));
@@ -276,14 +279,18 @@ const RegexColorizer = (() => {
         };
       // Group opening
       } else if (char0 === '(') {
-        // If this is an invalid group type, mark the error and don't count it toward group depth
-        // or total count
-        if (m.length === 2) { // m is '(?'
+        if (m === '(?') {
           output += to.error(m, error.INVALID_GROUP_TYPE);
+        // '(?<name>' with a duplicate name
+        } else if (captureNames.has(captureName)) {
+          output += to.error(expandEntities(m), error.DUPLICATE_CAPTURE_NAME);
+        // Valid group, so count it toward group depth and total count
         } else {
-          // TODO: Capture names must be unique
-          if (m.length === 1 || /^\(\?<[a-z_]/i.test(m)) {
+          if (m.length === 1 || captureName) {
             capturingGroupCount++;
+            if (captureName) {
+              captureNames.add(captureName);
+            }
           }
           groupStyleDepth = groupStyleDepth === 5 ? 1 : groupStyleDepth + 1;
           // Record the group opening's position and value so we can mark it later as invalid if it
@@ -292,7 +299,6 @@ const RegexColorizer = (() => {
             index: output.length + to.group.openingTagLength,
             opening: expandEntities(m),
           });
-          // Add markup to the group-opening character sequence
           output += to.group(expandEntities(m), groupStyleDepth);
         }
         lastToken = {
