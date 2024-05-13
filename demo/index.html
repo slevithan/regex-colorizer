@@ -22,29 +22,44 @@
     <li><strong>Size:</strong> 3.4 KB min/gzip, with no dependencies.</li>
     <li><strong>License:</strong> <a href="https://mit-license.org/">MIT</a>.</li>
   </ul>
-  <p>Adds syntax highlighting to regular expressions for readability. Supports the <strong>JavaScript regex flavor</strong>, with extensions for <strong>web reality</strong>. Unsupported regex features are marked as errors, along with some edge cases that can cause cross-browser grief. Syntax changes activated by flags <code>u</code> and <code>v</code> are not yet supported.</p>
-  <p>The API is simple. Just give elements that contain your regexes class <code>regex</code>, and call a couple functions (see below). The syntax highlighting, however, is quite advanced, and is contextually aware of things that happen forward or backward in the regex.</p>
+  <p>Add syntax highlighting to your regexes in blogs, docs, and regex testers. Supports the <strong>JavaScript regex flavor</strong>, with extensions for <strong>web reality</strong>. Regex syntax is complex, and the highlighting is contextually aware of things that happen forward or backward in the regex. Unsupported regex features are marked as errors, along with some edge cases that can cause cross-browser grief. Syntax changes activated by flags <code>u</code> and <code>v</code> are not yet supported.</p>
+  <p>The API is simple. Just give the elements that contain your regexes&mdash;<code>pre</code>, <code>code</code>, or whatever&mdash;the class <code>regex</code>, and call a couple functions (see below).</p>
 
   <h2>Examples</h2>
   <h3>SSN</h3>
   <pre class="regex">^(?!000|666)(?:[0-6]\d{2}|7(?:[0-6]\d|7[012]))-(?!00)\d{2}-(?!0000)\d{4}$</pre>
-  <h3>ZIP codes</h3>
-  <pre class="regex">\b[0-9]{5}(?:-[0-9]{4})?\b</pre>
-  <h3>Regex with errors</h3>
-  <p>Errors are highlighted in red. Hover over them for a description of the problem.</p>
-  <pre class="regex">Oh h\i+?? x*+ |? a{1,2}b{2,1} ||(?:a|b)* (?&lt;=(?&lt;name>x))* (?>n)
-((((?:((a))b.c)d|x(y)z{65536,}))))
-[^1-59-6\b-\cX.a-\w!---] \xFF \x \uFF\uFFFF\z\v\1\\\</pre>
+  <h3>Quoted string, allowing escaped quotes and slashes</h3>
+  <pre class="regex">(["'])(?:\\?.)*?\1</pre>
 
   <h2>Try it</h2>
   <p><textarea id="input" rows="3" cols="70" placeholder="Type a regex pattern" spellcheck="false" oninput="colorizeInput()"></textarea></p>
   <pre id="output" class="regex">Type a regex pattern</pre>
 
   <h2>Themes</h2>
-  <button onclick="setTheme('default')">Default</button>
-  <button onclick="setTheme('nobg')">No BG</button>
-  <button onclick="setTheme('regexpal')">RegexPal</button>
-  <button onclick="setTheme('regexbuddy')">RegexBuddy</button>
+  <div class="no-margin-collapse">
+    <p>
+      <button id="default-btn" onclick="setTheme('default')" disabled>Default</button>
+      <button id="nobg-btn" onclick="setTheme('nobg')">No BG</button>
+      <button id="regexpal-btn" onclick="setTheme('regexpal')">RegexPal</button>
+      <button id="regexbuddy-btn" onclick="setTheme('regexbuddy')">RegexBuddy</button>
+    </p>
+  </div>
+
+  <h2>More examples</h2>
+  <h3>Regex with errors</h3>
+  <p>Errors are highlighted in red. Hover over them for a description of the problem.</p>
+  <pre class="regex">Oh h\i+?? x*+ |? a{1,2}b{2,1} ||(?:a|b)* (?&lt;=(?&lt;name>x))* (?>n)
+((((?:((a))b.c)d|x(y){65536,}))))
+[^1-59-6\b-\cX.a-\w!---] \xFF \x \uFF\uFFFF\z\v\1\\\</pre>
+  <h3>Octals and backreferences</h3>
+  <pre class="regex">\\ Octals: leading 0 extends length
+\1234 \01234 \00123 \00000 \18 \80 \377 \400
+\\ After a capturing group
+(1) \10 \01000 \2000 \k&lt;1>
+\\ Different rules for leading 0 in character classes
+[ \1234 is the same but not \0123 ]
+\\ Double-digit backreferences
+(2)(3)(?&lt;name>4)(5)(6)(7)(8)(9)(10) \100 \11 \80</pre>
 
   <h2>Usage</h2>
   <p>Here's the code running on this page to highlight all of the above regexes:</p>
@@ -64,11 +79,11 @@ RegexColorizer.colorizeAll();</pre>
     RegexColorizer.colorizeAll();
 
     function setTheme(name) {
-      document.querySelectorAll('link').forEach(el => {
-        if (el.id.endsWith('-ss')) {
-          // Need to disable all before enabling the active stylesheet, else it's unreliable
-          el.disabled = true;
-        }
+      const themes = ['default', 'nobg', 'regexpal', 'regexbuddy'];
+      themes.forEach(theme => {
+        document.getElementById(`${theme}-btn`).disabled = theme === name;
+        // Need to disable all before enabling the active stylesheet
+        document.getElementById(`${theme}-ss`).disabled = true;
       });
       document.getElementById(`${name}-ss`).disabled = false;
     }

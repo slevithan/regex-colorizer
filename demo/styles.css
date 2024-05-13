@@ -1,11 +1,26 @@
-body {
-  font-family: Calibri, Verdana, Sans-serif;
-  padding: 0 30px 15px 30px;
+* {
   margin: 0;
 }
 
-h1, h2, h3 {
+body {
+  font-family: Calibri, "Helvetica Neue", sans-serif;
+  background-color: #fff;
+  padding: 0 30px 15px 30px;
+}
+
+h1, h2, ul, p, pre {
+  margin-bottom: 12px;
+}
+
+h1, h2 {
   font-family: Cambria;
+  margin-top: 18px;
+}
+
+h3 {
+  font-size: 1rem;
+  margin-top: 4px;
+  margin-bottom: 2px;
 }
 
 pre, code, textarea {
@@ -17,7 +32,6 @@ pre, code {
   border: 1px solid #e3e3e3;
   border-radius: 0.375rem;
   display: inline-block;
-  margin: 0;
 }
 
 pre, textarea {
@@ -29,17 +43,22 @@ code {
 }
 
 button {
-  margin-right: 4px;
-  padding: 6px 10px;
   font-weight: bold;
   border-radius: 0.4rem;
+  padding: 6px 10px;
+  margin-right: 4px;
 }
 
 footer {
   color: #aaa;
+  margin-top: 20px;
 }
 
 footer a {
   color: inherit;
   text-decoration: none;
+}
+
+.no-margin-collapse {
+  display: flow-root;
 }

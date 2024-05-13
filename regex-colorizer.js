@@ -493,14 +493,14 @@ const RegexColorizer = (() => {
     ss.id = 'regex-colorizer-ss';
     // See: themes/default.css
     ss.textContent = `
-.regex {font-family: Consolas, "Source Code Pro", Monospace; color: #000;}
+.regex {color: #000; font-family: Consolas, "Source Code Pro", Monospace;}
 .regex b {font-weight: normal;}
 .regex i {font-style: normal;}
 .regex u {text-decoration: none;}
-.regex * {border-radius: 0.2em;}
+.regex * {border-radius: 0.25em;}
 .regex span {background: #f0f0f0;}
 .regex b {background: #80c0ff; color: #092e7f;}
-.regex b.bref {background: #95e1ff; color: #062f89;}
+.regex b.bref {background: #86e9ff; color: #0d47c4;}
 .regex b.err {background: #e30000; color: #fff;}
 .regex i {background: #e3e3e3; font-style: italic;}
 .regex i span {background: #c3c3c3; font-style: normal;}

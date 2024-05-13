@@ -1,17 +1,17 @@
 /* Regex Colorizer: Default theme */
 
-.regex {font-family: Consolas, "Source Code Pro", Monospace; color: #000;}
+.regex {color: #000; font-family: Consolas, "Source Code Pro", Monospace;}
 .regex b {font-weight: normal;}
 .regex i {font-style: normal;}
 .regex u {text-decoration: none;}
-.regex * {border-radius: 0.2em;}
+.regex * {border-radius: 0.25em;}
 
 /* escaped literal */
 .regex span {background: #f0f0f0;}
 /* metasequence */
 .regex b {background: #80c0ff; color: #092e7f;}
 /* backreference */
-.regex b.bref {background: #95e1ff; color: #062f89;}
+.regex b.bref {background: #86e9ff; color: #0d47c4;}
 /* error */
 .regex b.err {background: #e30000; color: #fff;}
 

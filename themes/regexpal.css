@@ -1,6 +1,6 @@
 ﻿/* Regex Colorizer: RegexPal theme */
 
-.regex {font-family: Consolas, "Source Code Pro", Monospace; color: #000;}
+.regex {color: #000; font-family: Consolas, "Source Code Pro", Monospace;}
 .regex b {font-weight: normal;}
 .regex i {font-style: normal;}
 .regex u {text-decoration: none;}
