@@ -18,11 +18,27 @@
     h1, h2, h3 {
       font-family: Cambria;
     }
-    pre.regex, code.regex {
+    pre, code, textarea {
+      font-family: Consolas, "Source Code Pro", Monospace;
+      font-size: 1rem;
+    }
+    pre, code {
       border: 1px solid #ddd;
       display: inline-block;
-      padding: 2px;
       margin: 0;
+    }
+    pre, textarea {
+      padding: 8px;
+    }
+    code {
+      padding: 0 4px;
+    }
+    button {
+      margin-right: 4px;
+      padding: 4px 8px;
+    }
+    footer, footer a {
+      color: #aaa;
     }
   </style>
 </head>
@@ -34,7 +50,15 @@
     </a>
   </h1>
 
+  <ul>
+    <li><strong>Current version:</strong> 0.4.0.</li>
+    <li><strong>Size:</strong> 3.4 KB min/gzip (no dependencies).</li>
+    <li><strong>License:</strong> <a href="https://mit-license.org/">MIT</a>.</li>
+  </ul>
+
   <p>Adds syntax highlighting to regular expressions for readability. Supports the JavaScript regex flavor, with extensions for web reality. Any regex features not supported by JavaScript are marked as errors, along with some edge cases that cause cross-browser grief. Syntax changes activated by flags <code>u</code> and <code>v</code> are not yet supported.</p>
+
+  <p>The API is simple: just give your regexes the class <code>regex</code>, call a couple functions (see below), and you're done. The syntax highlighting, however, is quite advanced. Errors are highlighted in red; hover over them for a description of the problem.</p>
 
   <h2>Examples</h2>
 
@@ -48,14 +72,14 @@
 
   <h3>Regex with errors</h3>
 
-  <pre class="regex">Oh h\i+?? x*+ |? a{1,2}b{2,1} ||(?:a|b)* (?=x)* (?>n) (((((((a)))b.c)d|x(y)z{65536,}))))
+  <pre class="regex">Oh h\i+?? x*+ |? a{1,2}b{2,1} ||(?:a|b)* (?&lt;=(?&lt;name>x))* (?>n) (((((((a)))b.c)d|x(y)z{65536,}))))
 [1-59-6\b-\cX.a-\w!---] \xFF \x \uFF\uFFFF\z\v\1\\\</pre>
 
   <h2>Try it</h2>
 
-  <textarea id="input" rows="3" cols="80" placeholder="Type a regex pattern" spellcheck="false" oninput="colorizeInput()"></textarea>
+  <p><textarea id="input" rows="3" cols="82" placeholder="Type a regex pattern" spellcheck="false" oninput="colorizeInput()"></textarea></p>
 
-  <p><code id="output" class="regex">Type a regex pattern</code></p>
+  <pre id="output" class="regex">Type a regex pattern</pre>
 
   <h2>Themes</h2>
 
@@ -63,6 +87,22 @@
   <button onclick="setTheme('nobg')">No BG</button>
   <button onclick="setTheme('regexpal')">RegexPal</button>
   <button onclick="setTheme('regexbuddy')">RegexBuddy</button>
+
+  <h2>Usage</h2>
+
+  <p>Here's the code running on this page to highlight all of the above regexes:</p>
+
+  <pre>// Don't run this line if you provide your own stylesheet
+RegexColorizer.addStyleSheet();
+
+// Can provide a class name for elements to process (defaults to 'regex')
+RegexColorizer.colorizeAll();</pre>
+
+  <p>There is also a <code>RegexColorizer.colorizeText()</code> method that returns HTML with highlighting for the provided regex pattern string.</p>
+
+  <footer>
+    <p>&copy; 2010&ndash;2024 Steven Levithan | <a href="https://github.com/slevithan/regex-colorizer">GitHub</a></p>
+  </footer>
 
   <script src="../regex-colorizer.js"></script>
   <script>
