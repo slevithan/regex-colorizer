@@ -275,7 +275,8 @@ const RegexColorizer = (() => {
       quantifiable: false,
       type: type.NONE,
     };
-    // Most sequences of unescaped, literal tokens are matched in one step
+    // Sequences of unescaped, literal tokens are matched in one step (except '{', which is matched
+    // on its own)
     const matches = pattern.matchAll(regexToken);
 
     for (const match of matches) {
@@ -291,25 +292,34 @@ const RegexColorizer = (() => {
         };
       // Group opening
       } else if (char0 === '(') {
+        groupStyleDepth = groupStyleDepth === 5 ? 1 : groupStyleDepth + 1;
         if (m === '(?') {
+          openGroups.push({
+            valid: false,
+            opening: m,
+          });
           output += to.error(m, error.INVALID_GROUP_TYPE);
         // '(?<name>' with a duplicate name
         } else if (captureNames.has(captureName)) {
+          openGroups.push({
+            valid: false,
+            opening: expandEntities(m),
+          });
           output += to.error(expandEntities(m), error.DUPLICATE_CAPTURE_NAME);
-        // Valid group, so count it toward group depth and total count
+        // Valid group
         } else {
-          if (m.length === 1 || captureName) {
+          if (m === '(' || captureName) {
             capturingGroupCount++;
             if (captureName) {
               captureNames.add(captureName);
             }
           }
-          groupStyleDepth = groupStyleDepth === 5 ? 1 : groupStyleDepth + 1;
           // Record the group opening's position and value so we can mark it later as invalid if it
           // turns out to be unclosed in the remainder of the regex
           openGroups.push({
-            index: output.length + to.group.openingTagLength,
+            valid: true,
             opening: expandEntities(m),
+            index: output.length + to.group.openingTagLength,
           });
           output += to.group(expandEntities(m), groupStyleDepth);
         }
@@ -319,7 +329,7 @@ const RegexColorizer = (() => {
       // Group closing
       } else if (m === ')') {
         // If this is an invalid group closing
-        if (!openGroups.length) {
+        if (!openGroups.length || !openGroups.at(-1).valid) {
           output += to.error(m, error.UNBALANCED_RIGHT_PAREN);
           lastToken = {
             quantifiable: false,
@@ -330,13 +340,13 @@ const RegexColorizer = (() => {
           // you'd expect in JavaScript, and is an error with flag u or v (and in some other regex
           // flavors such as PCRE), so flag them as unquantifiable
           lastToken = {
-            quantifiable: !/^\(\?<?[=!]/.test(collapseEntities(openGroups[openGroups.length - 1].opening)),
+            quantifiable: !/^\(\?<?[=!]/.test(collapseEntities(openGroups.at(-1).opening)),
             groupStyleDepth,
           };
-          groupStyleDepth = groupStyleDepth === 1 ? 5 : groupStyleDepth - 1;
-          // Drop the last opening paren from depth tracking
-          openGroups.pop();
         }
+        groupStyleDepth = groupStyleDepth === 1 ? 5 : groupStyleDepth - 1;
+        // Drop the last opening paren from depth tracking
+        openGroups.pop();
       // Escape or backreference
       } else if (char0 === '\\') {
         // Backreference or octal character code without a leading zero
@@ -441,7 +451,7 @@ const RegexColorizer = (() => {
         lastToken = {
           quantifiable: false,
         };
-      // Vertical bar (alternator)
+      // Alternation
       } else if (m === '|') {
         // If there is a vertical bar at the very start of the regex, flag it as an error since it
         // effectively truncates the regex at that point. If two top-level vertical bars are next
@@ -480,6 +490,10 @@ const RegexColorizer = (() => {
     // Mark the opening character sequence for each unclosed grouping as invalid
     let numCharsAdded = 0;
     for (const openGroup of openGroups) {
+      // Skip groups that are already marked as errors
+      if (!openGroup.valid) {
+        continue;
+      }
       const errorIndex = openGroup.index + numCharsAdded;
       output = (
         output.slice(0, errorIndex) +
