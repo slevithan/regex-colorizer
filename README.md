@@ -10,7 +10,7 @@ Errors are highlighted, along with some edge cases that can cause cross-browser 
 
 ## Themes
 
-Several themes are provided as stylesheets, and you can easily create your own. You don't need any stylesheet to use the default theme.
+Several themes are available as stylesheets, and you can easily create your own. If you want to use the default theme, you don't need to manually add any styles to your page. The default styles can be loaded using `RegexColorizer.addStyleSheet()`.
 
 ## Usage
 
