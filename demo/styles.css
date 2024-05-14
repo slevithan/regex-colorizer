@@ -10,8 +10,9 @@ body {
 #content {
   background-color: #fff;
   max-width: 60rem;
-  padding: 25px 35px;
+  padding: 3vw 4.5vw;
   margin: 0 auto;
+  overflow: auto;
 }
 
 #content :first-child {
