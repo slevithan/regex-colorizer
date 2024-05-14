@@ -11,48 +11,48 @@
   <link href="styles.css" rel="stylesheet">
 </head>
 <body>
-  <h1>
-    Regex Colorizer
-    <a href="https://github.com/slevithan/regex-colorizer">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/c/c2/GitHub_Invertocat_Logo.svg" width="25" height="25" alt="GitHub">
-    </a>
-  </h1>
-  <ul>
-    <li><strong>Current version:</strong> 0.4.0.</li>
-    <li><strong>Size:</strong> 3.4 KB min/gzip, with no dependencies.</li>
-    <li><strong>License:</strong> <a href="https://mit-license.org/">MIT</a>.</li>
-  </ul>
-  <p>Add syntax highlighting to your regexes in blogs, docs, and regex testers. Supports the <strong>JavaScript regex flavor</strong>, with extensions for <strong>web reality</strong>. Regex syntax is complex, and the highlighting is contextually aware of things that happen forward or backward in the regex. Unsupported regex features are marked as errors, along with some edge cases that can cause cross-browser grief. Syntax changes activated by flags <code>u</code> and <code>v</code> are not yet supported.</p>
-  <p>The API is simple. Just give the elements that contain your regexes&mdash;<code>pre</code>, <code>code</code>, or whatever&mdash;the class <code>regex</code>, and call a couple functions (see below).</p>
+  <div id="content">
+    <h1>
+      Regex Colorizer
+      <a href="https://github.com/slevithan/regex-colorizer">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/c/c2/GitHub_Invertocat_Logo.svg" width="25" height="25" alt="GitHub">
+      </a>
+    </h1>
+    <ul>
+      <li><strong>Current version:</strong> 0.4.0.</li>
+      <li><strong>Size:</strong> 3.4 KB min/gzip, with no dependencies.</li>
+      <li><strong>License:</strong> <a href="https://mit-license.org/">MIT</a>.</li>
+    </ul>
+    <p>Add fancy syntax highlighting to your regexes in blogs, docs, and regex testers. Supports the <strong>JavaScript regex flavor</strong> (ES2024) with <strong>web reality</strong>. In other words, it highlights regexes as web browsers actually interpret them. Regex syntax is complex, and the highlighting is contextually aware of things that happen forward or backward in the regex. Unsupported regex features are marked as errors, along with some edge cases that can cause cross-browser grief. Syntax changes activated by flags <code>u</code> and <code>v</code> are not yet supported.</p>
+    <p>The API is simple. Just give the elements that contain your regexes&mdash;<code>pre</code>, <code>code</code>, or whatever&mdash;the class <code>regex</code>, and call a couple functions (see below).</p>
 
-  <h2>Examples</h2>
-  <h3>SSN</h3>
-  <pre class="regex">^(?!000|666)(?:[0-6]\d{2}|7(?:[0-6]\d|7[012]))-(?!00)\d{2}-(?!0000)\d{4}$</pre>
-  <h3>Quoted string, allowing escaped quotes and slashes</h3>
-  <pre class="regex">(["'])(?:\\?.)*?\1</pre>
+    <h2>Examples</h2>
+    <h3>SSN</h3>
+    <pre class="regex">^(?!000|666)(?:[0-6]\d{2}|7(?:[0-6]\d|7[012]))-(?!00)\d{2}-(?!0000)\d{4}$</pre>
+    <h3>Quoted string, allowing escaped quotes and slashes</h3>
+    <pre class="regex">(["'])(?:\\?.)*?\1</pre>
 
-  <h2>Try it</h2>
-  <p><textarea id="input" rows="3" cols="70" placeholder="Type a regex pattern" spellcheck="false" oninput="colorizeInput()"></textarea></p>
-  <pre id="output" class="regex">Type a regex pattern</pre>
+    <h2>Try it</h2>
+    <p><textarea id="input" rows="3" cols="70" placeholder="Type a regex pattern" spellcheck="false" oninput="colorizeInput()"></textarea></p>
+    <pre id="output" class="regex">Type a regex pattern</pre>
 
-  <h2>Themes</h2>
-  <div class="no-margin-collapse">
-    <p>
+    <h2>Themes</h2>
+    <p class="no-margin-collapse">
       <button id="default-btn" onclick="setTheme('default')" disabled>Default</button>
       <button id="nobg-btn" onclick="setTheme('nobg')">No BG</button>
       <button id="regexpal-btn" onclick="setTheme('regexpal')">RegexPal</button>
       <button id="regexbuddy-btn" onclick="setTheme('regexbuddy')">RegexBuddy</button>
     </p>
-  </div>
 
-  <h2>More examples</h2>
-  <h3>Regex with errors</h3>
-  <p>Errors are highlighted in red. Hover over them for a description of the problem.</p>
-  <pre class="regex">Oh h\i+?? x*+ |? a{1,2}b{2,1} ||(?:a|b)* (?&lt;=(?&lt;name>x))* (?>n)
+    <h2>More examples</h2>
+    <h3>Regex with errors</h3>
+    <p>Errors are highlighted in red. Hover over them for a description of the problem.</p>
+    <pre class="regex">Oh h\i+?? x*+ |? a{1,2}b{2,1} ||(?:a|b)* (?&lt;=(?&lt;name>x))* (?>n)
 ((((?:((a))b.c)d|x(y){65536,}))))
 [^1-59-6\b-\cX.a-\w!---] \xFF \x \uFF\uFFFF\z\v\1\\\</pre>
-  <h3>Octals and backreferences</h3>
-  <pre class="regex">\\ Octals: leading 0 extends length
+    <h3>Octals and backreferences</h3>
+    <p>An example of contextually-aware highlighting of regex behavior in web reality.</p>
+    <pre class="regex">\\ Octals: leading 0 extends length
 \1234 \01234 \00123 \00000 \18 \80 \377 \400
 \\ After a capturing group
 (1) \10 \01000 \2000 \k&lt;1>
@@ -60,22 +60,25 @@
 [ \1234 is the same but not \0123 ]
 \\ Double-digit backreferences
 (2)(3)(?&lt;name>4)(5)(6)(7)(8)(9)(10) \100 \11 \80</pre>
-  <div class="no-margin-collapse">
-    <p>Another example of the contextual awareness of highlighting is the handling for <code>\k&lt;name></code>. Without flag <code>u</code> or <code>v</code>, it's only a named backreference if a named capture appears in the regex (before or after the backreference, with any capture name).</p>
-  </div>
+    <p>Some other examples of contextually-aware highlighting:</p>
+    <ul class="no-margin-collapse">
+      <li>Named backreferences: <code>\k&lt;name></code> is only a named backreference if a named capture (with any name) appears in the regex, even if after or enclosing the backreference (so <code class="regex">\k&lt;n>(?&lt;n>a)</code> and <code class="regex">(?&lt;n>a\k&lt;n>)</code> are valid; the backreferences match empty strings). If there aren't any named captures in the pattern, it's an escaped literal <code class="regex">\k&lt;name></code> and matches the string <code>'k&lt;name>'</code>. When named backreference behavior is triggered, <code>\k</code> is an error if it's not a complete token (ex: <code class="regex">(?&lt;n>)\k</code>), if the name is invalid (ex: <code class="regex">(?&lt;n>)\k&lt;1></code>), or if there's no corresponding named capturing group anywhere in the regex (ex: <code class="regex">(?&lt;n>)\k&lt;m></code>). Flags <code>u</code> and <code>v</code> enforce named backreference mode handling in all cases.</code></li>
+      <li>Hypens in character classes: Hyphens only create ranges when preceded and followed by rangeable tokens in the correct order that aren't themselves part of ranges. Hyphens are literal <code>-</code> characters in other cases. Compare <code class="regex">[----]</code> (one range-hyphen), <code class="regex">[-----]</code> (still one), and <code class="regex">[------]</code> (two). Also handles errors (ex: <code class="regex">[z-a]</code> and <code class="regex">[\w-z]</code>, but <code class="regex">[\w-]</code>) and metasequences or escaped literals that are used in valid ranges (ex: <code class="regex">[a-\z]</code> and <code class="regex">[\b-\cZ]</code>, but <code class="regex">[\cZ-\b]</code>). Note: Within a character class, <code>\b</code> matches a backspace control character rather than a word boundary. Flag <code>v</code> changes the rules to make any unescaped, non-range hyphens in character classes become errors, and enables <code>--</code> as the set substraction operator.</li>
+    </ul>
 
-  <h2>Usage</h2>
-  <p>Here's the code running on this page to highlight all of the above regexes:</p>
-  <pre>// Don't run this line if you provide your own stylesheet
+    <h2>Usage</h2>
+    <p>Here's the code running on this page to highlight all of the above regexes:</p>
+    <pre>// Don't run this line if you provide your own stylesheet
 RegexColorizer.addStyleSheet();
 
 // Can provide a class name for elements to process (defaults to 'regex')
 RegexColorizer.colorizeAll();</pre>
-  <p>There is also <code>RegexColorizer.colorizeText()</code> that returns HTML with highlighting for the provided regex pattern string.</p>
+    <p>There is also <code>RegexColorizer.colorizeText()</code> that returns HTML with highlighting for the provided regex pattern string.</p>
 
-  <footer>
-    <p>&copy; 2010&ndash;2024 Steven Levithan | <a href="https://github.com/slevithan/regex-colorizer">GitHub</a></p>
-  </footer>
+    <footer>
+      <p>&copy; 2010&ndash;2024 Steven Levithan | <a href="https://github.com/slevithan/regex-colorizer">GitHub</a></p>
+    </footer>
+  </div>
 
   <script src="../regex-colorizer.js"></script>
   <script>
