@@ -114,7 +114,7 @@ const RegexColorizer = (() => {
         return parseInt(t, 8);
       }
       // Shorthand class or incomplete token
-      if (t.length === 1 && 'cuxDdSsWw'.indexOf(t) > -1) {
+      if (t.length === 1 && 'cuxDdSsWw'.includes(t)) {
         return NaN;
       }
       // Metacharacter representing a single character index, or escaped literal character
@@ -317,15 +317,15 @@ const RegexColorizer = (() => {
           quantifiable: false,
         };
       // Group closing
-      } else if (char0 === ')') {
+      } else if (m === ')') {
         // If this is an invalid group closing
         if (!openGroups.length) {
-          output += to.error(')', error.UNBALANCED_RIGHT_PAREN);
+          output += to.error(m, error.UNBALANCED_RIGHT_PAREN);
           lastToken = {
             quantifiable: false,
           };
         } else {
-          output += to.group(')', groupStyleDepth);
+          output += to.group(m, groupStyleDepth);
           // Although it's possible to quantify lookarounds, this adds no value, doesn't work as
           // you'd expect in JavaScript, and is an error with flag u or v (and in some other regex
           // flavors such as PCRE), so flag them as unquantifiable
@@ -398,7 +398,7 @@ const RegexColorizer = (() => {
               quantifiable: false,
             };
           // Unquantifiable metasequence
-          } else if ('bB'.indexOf(char1) > -1) {
+          } else if ('bB'.includes(char1)) {
             output += to.metasequence(m);
             lastToken = {
               quantifiable: false,
