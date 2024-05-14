@@ -17,7 +17,7 @@ const RegexColorizer = (() => {
   const regexToken = new RegExp(String.raw`
 \[\^?(?:[^\\\]]+|\\.?)*]?
 |
-\\(?:0(?:[0-3][0-7]{0,2}|[4-7][0-7]?)?|[1-9]\d*|x[\dA-Fa-f]{2}|u[\dA-Fa-f]{4}|c[A-Za-z]|k<[A-Za-z_]\w*>|.?)
+\\(?:0(?:[0-3][0-7]{0,2}|[4-7][0-7]?)?|[1-9]\d*|x[\dA-Fa-f]{2}|u[\dA-Fa-f]{4}|c[A-Za-z]|k(?:<(?<backrefName>\w+)>)?|.?)
 |
 \((?:\?(?:<(?:[=!]|(?<captureName>[A-Za-z_]\w*)>)|[:=!]?))?
 |
@@ -42,6 +42,7 @@ const RegexColorizer = (() => {
     INCOMPLETE_TOKEN: 'Incomplete regex token',
     INTERVAL_OVERFLOW: 'Interval quantifier cannot use value over 65,535',
     INTERVAL_REVERSED: 'Interval quantifier range is reversed',
+    INVALID_GROUP_NAME: 'Missing or invalid group name',
     INVALID_GROUP_TYPE: 'Invalid or unsupported group type',
     INVALID_RANGE: 'Reversed or invalid range',
     UNBALANCED_LEFT_PAREN: 'Unclosed grouping',
@@ -151,9 +152,9 @@ const RegexColorizer = (() => {
       type: type.NONE,
     };
     const {opening, content, closing} = charClassParts.exec(value).groups;
+
     // Sequences of unescaped, literal tokens are matched in one step
     const matches = content.matchAll(charClassToken);
-
     for (const match of matches) {
       const m = match[0];
       // Escape
@@ -177,9 +178,8 @@ const RegexColorizer = (() => {
         } else if (/^\\[dsw]$/i.test(m)) {
           output += to.metasequence(m);
           // Traditional regex behavior is that a shorthand class should be unrangeable. Hence,
-          // [-\dz], [\d-z], and [z-\d] should all be equivalent. However, at least some browsers
-          // handle this inconsistently. E.g., Firefox 2 throws an invalid range error for [z-\d]
-          // and [\d--]
+          // [-\dz], [\d-z], and [z-\d] should all be equivalent. However, some old browsers handle
+          // this inconsistently. Ex: Firefox 2 throws an invalid range error for [z-\d] and [\d--]
           lastToken = {
             rangeable: lastToken.type !== type.RANGE_HYPHEN,
             type: type.SHORT_CLASS,
@@ -206,7 +206,7 @@ const RegexColorizer = (() => {
 
           if (nextToken) {
             const nextTokenCharCode = getTokenCharCode(nextToken[0]);
-            // Hypen for a reverse range (e.g., z-a) or shorthand class (e.g., \d-x or x-\S)
+            // Hypen for a reverse range (ex: z-a) or shorthand class (ex: \d-x or x-\S)
             if (
               (!isNaN(nextTokenCharCode) && lastToken.charCode > nextTokenCharCode) ||
               lastToken.type === type.SHORT_CLASS ||
@@ -256,6 +256,23 @@ const RegexColorizer = (() => {
     return output;
   }
 
+  /**
+   * Returns unique capture names used in a regex pattern.
+   * @param {string} pattern Regex pattern to be searched.
+   * @returns {Set} Unique capture names.
+   */
+  function getCaptureNames(pattern) {
+    const captureNames = new Set();
+    const matches = pattern.matchAll(regexToken);
+    for (const match of matches) {
+      const captureName = match.groups.captureName;
+      if (captureName) {
+        captureNames.add(captureName);
+      }
+    }
+    return captureNames;
+  }
+
 // ------------------------------------
 // Public methods
 // ------------------------------------
@@ -270,20 +287,21 @@ const RegexColorizer = (() => {
     let capturingGroupCount = 0;
     let groupStyleDepth = 0;
     const openGroups = [];
-    const captureNames = new Set();
+    const usedCaptureNames = new Set();
+    // Having any named captures changes the meaning of '\k', so we have to know in advance
+    const allCaptureNames = getCaptureNames(pattern);
     let lastToken = {
       quantifiable: false,
       type: type.NONE,
     };
-    // Sequences of unescaped, literal tokens are matched in one step (except '{', which is matched
-    // on its own)
-    const matches = pattern.matchAll(regexToken);
 
+    // Sequences of unescaped, literal tokens are matched in one step (except '{' when not part of
+    // a quantifier, which is matched on its own)
+    const matches = pattern.matchAll(regexToken);
     for (const match of matches) {
       const m = match[0];
       const char0 = m.charAt(0);
       const char1 = m.charAt(1);
-      const captureName = match.groups.captureName;
       // Character class
       if (char0 === '[') {
         output += to.charClass(parseCharClass(m));
@@ -292,6 +310,7 @@ const RegexColorizer = (() => {
         };
       // Group opening
       } else if (char0 === '(') {
+        const captureName = match.groups.captureName;
         groupStyleDepth = groupStyleDepth === 5 ? 1 : groupStyleDepth + 1;
         if (m === '(?') {
           openGroups.push({
@@ -300,7 +319,7 @@ const RegexColorizer = (() => {
           });
           output += to.error(m, error.INVALID_GROUP_TYPE);
         // '(?<name>' with a duplicate name
-        } else if (captureNames.has(captureName)) {
+        } else if (usedCaptureNames.has(captureName)) {
           openGroups.push({
             valid: false,
             opening: expandEntities(m),
@@ -311,7 +330,7 @@ const RegexColorizer = (() => {
           if (m === '(' || captureName) {
             capturingGroupCount++;
             if (captureName) {
-              captureNames.add(captureName);
+              usedCaptureNames.add(captureName);
             }
           }
           // Record the group opening's position and value so we can mark it later as invalid if it
@@ -349,7 +368,7 @@ const RegexColorizer = (() => {
         openGroups.pop();
       // Escape or backreference
       } else if (char0 === '\\') {
-        // Backreference or octal character code without a leading zero
+        // Backreference, octal character code without a leading zero, or a literal '\8' or '\9'
         if (/^[1-9]/.test(char1)) {
           // What does '\10' mean?
           // - Backref 10, if 10 or more capturing groups opened before this point
@@ -385,16 +404,41 @@ const RegexColorizer = (() => {
           lastToken = {
             quantifiable: true,
           };
-        // Named backreference
-        } else if (char1 === 'k' && m.length > 2) {
-          // TODO: Add correct handling for \k<name> (assuming no flag u or v):
+        // Named backreference, \k token with error, or a literal '\k' or '\k<name>'
+        } else if (char1 === 'k') {
+          // What does '\k' or '\k<name>' mean?
           // - If a named capture appears anywhere (before or after), treat as backreference
-          // - Otherwise, it's a literal '\k<name>'
+          // - Otherwise, it's a literal '\k' plus any following chars
           // - In backreference mode, error if name doesn't appear in a capture (before or after)
-          output += to.backref(expandEntities(m));
-          lastToken = {
-            quantifiable: true,
-          };
+          // With flag u or v, the rules change to only use backreference mode
+          // Backreference mode
+          if (allCaptureNames.size) {
+            // Valid
+            if (allCaptureNames.has(match.groups.backrefName)) {
+              output += to.backref(expandEntities(m));
+              lastToken = {
+                quantifiable: true,
+              };
+            // References a missing or invalid (ex: \k<1>) named group
+            } else if (m.endsWith('>')) {
+              output += to.error(expandEntities(m), error.INVALID_GROUP_NAME);
+              lastToken = {
+                quantifiable: false,
+              };
+            // '\k'
+            } else {
+              output += to.error(m, error.INCOMPLETE_TOKEN);
+              lastToken = {
+                quantifiable: false,
+              };
+            }
+          // Literal mode
+          } else {
+            output += to.escapedLiteral('\\k') + expandEntities(m.slice(2));
+            lastToken = {
+              quantifiable: true,
+            };
+          }
         // Metasequence
         } else if (/^[0bBcdDfnrsStuvwWx]/.test(char1)) {
           // Browsers differ on how they handle:
