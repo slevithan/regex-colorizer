@@ -572,7 +572,7 @@ const RegexColorizer = (() => {
 .regex span {background: #f0f0f0;}
 .regex b {background: #80c0ff; color: #092e7f;}
 .regex b.bref {background: #86e9ff; color: #0d47c4;}
-.regex b.err {background: #e30000; color: #fff;}
+.regex b.err {background: #e30000; color: #fff; font-style: normal;}
 .regex i {background: #e3e3e3; font-style: italic;}
 .regex i span {background: #c3c3c3; font-style: normal;}
 .regex i b {background: #c3c3c3;}

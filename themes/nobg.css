@@ -12,7 +12,7 @@
 /* backreference */
 .regex b.bref {color: #666666; text-decoration: underline dotted;}
 /* error */
-.regex b.err {color: #d50000; font-weight: bold;}
+.regex b.err {color: #d50000; font-weight: bold; font-style: normal;}
 
 /* char class */
 .regex i {color: #1db000; font-style: italic;}

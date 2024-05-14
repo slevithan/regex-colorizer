@@ -13,7 +13,7 @@
 /* backreference */
 .regex b.bref {background: #86e9ff; color: #0d47c4;}
 /* error */
-.regex b.err {background: #e30000; color: #fff;}
+.regex b.err {background: #e30000; color: #fff; font-style: normal;}
 
 /* char class */
 .regex i {background: #e3e3e3; font-style: italic;}
