@@ -1,6 +1,6 @@
 /* Regex Colorizer: No BG theme */
 
-.regex {color: #000; font-family: Consolas, "Source Code Pro", Monospace;}
+.regex {color: #000; font-family: Consolas, "Source Code Pro", Monospace; white-space: pre-wrap; word-break: break-all; overflow-wrap: anywhere;}
 .regex b {font-weight: normal;}
 .regex i {font-style: normal;}
 .regex u {text-decoration: none;}
