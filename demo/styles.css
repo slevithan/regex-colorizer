@@ -1,4 +1,5 @@
 * {
+  box-sizing: border-box;
   margin: 0;
 }
 
@@ -12,7 +13,6 @@ body {
   max-width: 60rem;
   padding: 3vw 4.5vw;
   margin: 0 auto;
-  overflow: auto;
 }
 
 #content :first-child {
@@ -43,8 +43,8 @@ h3 {
 }
 
 textarea {
-  box-sizing: border-box;
   width: 100%;
+  /* Copy the whitepace/wrapping styles applied to regexes by Regex Colorizer's themes */
   white-space: pre-wrap;
   word-break: break-all;
   overflow-wrap: anywhere;
@@ -67,8 +67,9 @@ pre {
   display: inline-block;
 }
 
-.regex {
-  border: 1px dotted #aaa;
+pre.code {
+  max-width: 100%;
+  overflow-x: auto;
 }
 
 code, pre.code {
@@ -82,6 +83,10 @@ code {
 code.regex {
   padding: 1px;
   background-color: inherit;
+}
+
+.regex {
+  border: 1px dotted #aaa;
 }
 
 button {
