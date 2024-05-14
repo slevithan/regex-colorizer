@@ -38,16 +38,16 @@ const RegexColorizer = (() => {
   };
   const error = {
     DUPLICATE_CAPTURE_NAME: 'Duplicate capture name',
-    UNCLOSED_CLASS: 'Unclosed character class',
+    EMPTY_TOP_ALTERNATIVE: 'Empty alternative effectively truncates the regex here',
     INCOMPLETE_TOKEN: 'Incomplete regex token',
-    INVALID_RANGE: 'Reversed or invalid range',
-    INVALID_GROUP_TYPE: 'Invalid or unsupported group type',
-    UNBALANCED_LEFT_PAREN: 'Unclosed grouping',
-    UNBALANCED_RIGHT_PAREN: 'No matching opening parenthesis',
     INTERVAL_OVERFLOW: 'Interval quantifier cannot use value over 65,535',
     INTERVAL_REVERSED: 'Interval quantifier range is reversed',
+    INVALID_GROUP_TYPE: 'Invalid or unsupported group type',
+    INVALID_RANGE: 'Reversed or invalid range',
+    UNBALANCED_LEFT_PAREN: 'Unclosed grouping',
+    UNBALANCED_RIGHT_PAREN: 'No matching opening parenthesis',
+    UNCLOSED_CLASS: 'Unclosed character class',
     UNQUANTIFIABLE: 'Quantifiers must be preceded by a token that can be repeated',
-    IMPROPER_EMPTY_ALTERNATIVE: 'Empty alternative effectively truncates the regex here',
   };
   const self = {};
 
@@ -457,7 +457,7 @@ const RegexColorizer = (() => {
         // effectively truncates the regex at that point. If two top-level vertical bars are next
         // to each other, flag it as an error for the same reason
         if (lastToken.type === type.NONE || (lastToken.type === type.ALTERNATOR && !openGroups.length)) {
-          output += to.error(m, error.IMPROPER_EMPTY_ALTERNATIVE);
+          output += to.error(m, error.EMPTY_TOP_ALTERNATIVE);
         } else {
           // Alternators within groups are shown in the style of the containing group's depth
           output += to.alternator(m, openGroups.length && groupStyleDepth);
