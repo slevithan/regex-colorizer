@@ -17,7 +17,7 @@
 
 /* group: depth */
 .regex b.g1 {background: #00c000; color: #fff;}
-.regex b.g2 {background: #c0c000;}
+.regex b.g2 {background: #c0c000; color: #000;}
 .regex b.g3 {background: #008000; color: #fff;}
 .regex b.g4 {background: #808000; color: #fff;}
-.regex b.g5 {background: #0f0;}
+.regex b.g5 {background: #0f0; color: #000;}

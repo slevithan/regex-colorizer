@@ -569,18 +569,18 @@ const RegexColorizer = (() => {
 .regex i {font-style: normal;}
 .regex u {text-decoration: none;}
 .regex * {border-radius: 0.25em;}
-.regex span {background: #f0f0f0;}
+.regex span {background: #eee;}
 .regex b {background: #80c0ff; color: #092e7f;}
 .regex b.bref {background: #86e9ff; color: #0d47c4;}
 .regex b.err {background: #e30000; color: #fff; font-style: normal;}
 .regex i {background: #e3e3e3; font-style: italic;}
 .regex i span {background: #c3c3c3; font-style: normal;}
-.regex i b {background: #c3c3c3;}
+.regex i b {background: #c3c3c3; color: #222;}
 .regex i u {background: #d3d3d3;}
-.regex b.g1 {background: #b4fa50;}
-.regex b.g2 {background: #8cd400;}
+.regex b.g1 {background: #b4fa50; color: #074d0b;}
+.regex b.g2 {background: #8cd400; color: #053c08;}
 .regex b.g3 {background: #26b809; color: #fff;}
-.regex b.g4 {background: #30ea60;}
+.regex b.g4 {background: #30ea60; color: #125824;}
 .regex b.g5 {background: #0c8d15; color: #fff;}
     `;
     document.querySelector('head').appendChild(ss);
