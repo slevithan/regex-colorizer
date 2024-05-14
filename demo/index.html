@@ -23,13 +23,14 @@
       <li><strong>Size:</strong> 3.4 KB min/gzip, with no dependencies.</li>
       <li><strong>License:</strong> <a href="https://mit-license.org/">MIT</a>.</li>
     </ul>
-    <p>Add fancy syntax highlighting to your regexes in blogs, docs, and regex testers. Supports the <strong>JavaScript regex flavor</strong> (ES2024) with <strong>web reality</strong>. In other words, it highlights regexes as web browsers actually interpret them. Regex syntax is complex, and the highlighting is contextually aware of things that happen forward or backward in the regex. Unsupported regex features are marked as errors, along with some edge cases that can cause cross-browser grief. Syntax changes activated by flags <code>u</code> and <code>v</code> are not yet supported.</p>
+    <p>Add fancy syntax highlighting to your regexes in blogs, docs, and regex testers. Supports the <strong>JavaScript regex flavor</strong> (<a href="https://github.com/slevithan/awesome-regex#javascript-regex-evolution">ES2024</a>) with <strong>web reality</strong>. In other words, it highlights regexes as web browsers actually interpret them. Syntax changes activated by flags <code>u</code> and <code>v</code> are not yet supported.</p>
+    <p>Regex syntax is complex, and the highlighting is contextually aware of things that happen forward or backward in the regex. Unsupported regex features are marked as errors, along with some edge cases that can cause cross-browser grief.</p>
     <p>The API is simple. Just give the elements that contain your regexes&mdash;<code>pre</code>, <code>code</code>, or whatever&mdash;the class <code>regex</code>, and call a couple functions (see below).</p>
 
     <h2>Examples</h2>
-    <h3>SSN</h3>
+    <h3>SSN, excluding invalid ranges</h3>
     <pre class="regex">^(?!000|666)(?:[0-6]\d{2}|7(?:[0-6]\d|7[012]))-(?!00)\d{2}-(?!0000)\d{4}$</pre>
-    <h3>Quoted string, allowing escaped quotes and slashes</h3>
+    <h3>Quoted string, allowing escaped quotes and backslashes</h3>
     <pre class="regex">(["'])(?:\\?.)*?\1</pre>
 
     <h2>Try it</h2>
