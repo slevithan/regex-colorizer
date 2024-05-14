@@ -4,7 +4,7 @@
 
 body {
   font-family: Calibri, "Helvetica Neue", sans-serif;
-  background-color: #e3e3e3;
+  background-color: #e0e0e0;
 }
 
 #content {
@@ -62,17 +62,21 @@ pre, textarea {
 
 pre {
   display: inline-block;
-  border: 1px solid #ddd;
   white-space: pre-wrap;
+  word-break: break-all;
+  overflow-wrap: anywhere;
 }
 
 .regex {
   border: 1px dotted #aaa;
 }
 
+code, pre.code {
+  background-color: #eee;
+}
+
 code {
   padding: 0 3px;
-  background-color: #e3e3e3;
 }
 
 code.regex {
@@ -95,4 +99,20 @@ footer {
 footer a {
   color: inherit;
   text-decoration: none;
+}
+
+footer a:hover {
+  color: initial;
+}
+
+footer img, h1 img:hover {
+  filter: invert(70%);
+}
+
+footer img:hover {
+  filter: unset;
+}
+
+img {
+  vertical-align: middle;
 }

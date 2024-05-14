@@ -24,8 +24,7 @@
       <li><strong>License:</strong> <a href="https://mit-license.org/">MIT</a>.</li>
     </ul>
     <p>Add fancy syntax highlighting to your regexes in blogs, docs, and regex testers. Supports the <strong>JavaScript regex flavor</strong> (<a href="https://github.com/slevithan/awesome-regex#javascript-regex-evolution">ES2024</a>) with <strong>web reality</strong>. In other words, it highlights regexes as web browsers actually interpret them. Syntax changes activated by flags <code>u</code> and <code>v</code> are not yet supported.</p>
-    <p>Regex syntax is complex, and the highlighting is contextually aware of things that happen forward or backward in the regex. Unsupported regex features are marked as errors, along with some edge cases that can cause cross-browser grief.</p>
-    <p>The API is simple. Just give the elements that contain your regexes&mdash;<code>pre</code>, <code>code</code>, or whatever&mdash;the class <code>regex</code>, and call a couple functions (see below).</p>
+    <p>The API is simple. Just give the elements that contain your regexes (<code>pre</code>, <code>code</code>, or whatever) the class <code>regex</code>, and call a couple functions (see below).</p>
 
     <h2>Examples</h2>
     <h3>SSN, excluding invalid ranges</h3>
@@ -38,6 +37,7 @@
     <pre id="output" class="regex">Type a regex pattern</pre>
 
     <h2>Themes</h2>
+    <p>Several themes are provided as stylesheets, and you can easily create your own. You don't need any stylesheet to use the default theme.</p>
     <p class="no-margin-collapse">
       <button id="default-btn" onclick="setTheme('default')" disabled>Default</button>
       <button id="nobg-btn" onclick="setTheme('nobg')">No BG</button>
@@ -47,12 +47,12 @@
 
     <h2>More examples</h2>
     <h3>Regex with errors</h3>
-    <p>Errors are highlighted in red. Hover over them for a description of the problem.</p>
+    <p>Errors are highlighted in red, along with some edge cases that can cause cross-browser grief. Hover over errors for a description of the problem.</p>
     <pre class="regex">Oh h\i+?? x*+ |? a{1,2}b{2,1} ||(?:a|b)* (?&lt;=(?&lt;name>x))* (?>n)
 ((((?:((a))b.c)d|x(y){65536,}))))
 [^1-59-6\b-\cX.a-\w!---] \xFF \x \uFF\uFFFF\z\v\1\\\</pre>
     <h3>Octals and backreferences</h3>
-    <p>An example of contextually-aware highlighting of regex behavior in web reality.</p>
+    <p>Regex syntax is complex, so Regex Colorizer's highlighting is contextually aware of things that happen forward and backward in the regex. Here's an example of contextually-aware highlighting of regex syntax/behavior in web reality:</p>
     <pre class="regex">\\ Octals: leading 0 extends length
 \1234 \01234 \00123 \00000 \18 \80 \377 \400
 \\ After a capturing group
@@ -63,13 +63,13 @@
 (2)(3)(?&lt;name>4)(5)(6)(7)(8)(9)(10) \100 \11 \80</pre>
     <p>Some other examples of contextually-aware highlighting:</p>
     <ul class="no-margin-collapse">
-      <li>Named backreferences: <code>\k&lt;name></code> is only a named backreference if a named capture (with any name) appears in the regex, even if after or enclosing the backreference (so <code class="regex">\k&lt;n>(?&lt;n>a)</code> and <code class="regex">(?&lt;n>a\k&lt;n>)</code> are valid; the backreferences match empty strings). If there aren't any named captures in the pattern, it's an escaped literal <code class="regex">\k&lt;name></code> and matches the string <code>'k&lt;name>'</code>. When named backreference behavior is triggered, <code>\k</code> is an error if it's not a complete token (ex: <code class="regex">(?&lt;n>)\k</code>), if the name is invalid (ex: <code class="regex">(?&lt;n>)\k&lt;1></code>), or if there's no corresponding named capturing group anywhere in the regex (ex: <code class="regex">(?&lt;n>)\k&lt;m></code>). Flags <code>u</code> and <code>v</code> enforce named backreference mode handling in all cases.</code></li>
-      <li>Hypens in character classes: Hyphens only create ranges when preceded and followed by rangeable tokens in the correct order that aren't themselves part of ranges. Hyphens are literal <code>-</code> characters in other cases. Compare <code class="regex">[----]</code> (one range-hyphen), <code class="regex">[-----]</code> (still one), and <code class="regex">[------]</code> (two). Also handles errors (ex: <code class="regex">[z-a]</code> and <code class="regex">[\w-z]</code>, but <code class="regex">[\w-]</code>) and metasequences or escaped literals that are used in valid ranges (ex: <code class="regex">[a-\z]</code> and <code class="regex">[\b-\cZ]</code>, but <code class="regex">[\cZ-\b]</code>). Note: Within a character class, <code>\b</code> matches a backspace control character rather than a word boundary. Flag <code>v</code> changes the rules to make any unescaped, non-range hyphens in character classes become errors, and enables <code>--</code> as the set substraction operator.</li>
+      <li><strong>Named backreferences:</strong> <code>\k&lt;name></code> is only a named backreference if a named capture (with any name) appears in the regex, even if after or enclosing the backreference (so <code class="regex">\k&lt;n>(?&lt;n>a)</code> and <code class="regex">(?&lt;n>a\k&lt;n>)</code> are valid; the backreferences match empty strings). If there aren't any named captures in the pattern, it's an escaped literal <code class="regex">\k&lt;name></code> and matches the string <code>'k&lt;name>'</code>. When named backreference behavior is triggered, <code>\k</code> is an error if it's not a complete token (ex: <code class="regex">(?&lt;n>)\k</code>), if the name is invalid (ex: <code class="regex">(?&lt;n>)\k&lt;1></code>), or if there's no corresponding named capturing group anywhere in the regex (ex: <code class="regex">(?&lt;n>)\k&lt;m></code>). Flags <code>u</code> and <code>v</code> enforce named backreference mode handling in all cases.</code></li>
+      <li><strong>Hypens in character classes:</strong> Hyphens only create ranges when preceded and followed by rangeable tokens in the correct order that aren't themselves part of ranges. Hyphens are literal <code>-</code> characters in other cases. Compare <code class="regex">[----]</code> (one range-hyphen), <code class="regex">[-----]</code> (still one), and <code class="regex">[------]</code> (two). Also handles errors (ex: <code class="regex">[z-a]</code> and <code class="regex">[\w-z]</code>, but <code class="regex">[\w-]</code>) and metasequences or escaped literals that are used in valid ranges (ex: <code class="regex">[a-\z]</code> and <code class="regex">[\b-\cZ]</code>, but <code class="regex">[\cZ-\b]</code>). Note: Within a character class, <code>\b</code> matches a backspace control character rather than a word boundary. Flag <code>v</code> changes the rules to make any unescaped, non-range hyphens in character classes become errors, and enables <code>--</code> as the set substraction operator.</li>
     </ul>
 
     <h2>Usage</h2>
     <p>Here's the code running on this page to highlight all of the above regexes:</p>
-    <pre>// Don't run this line if you provide your own stylesheet
+    <pre class="code">// Don't run this line if you provide your own stylesheet
 RegexColorizer.addStyleSheet();
 
 // Can provide a class name for elements to process (defaults to 'regex')
@@ -77,7 +77,16 @@ RegexColorizer.colorizeAll();</pre>
     <p>There is also <code>RegexColorizer.colorizeText()</code> that returns HTML with highlighting for the provided regex pattern string.</p>
 
     <footer>
-      <p>&copy; 2010&ndash;2024 Steven Levithan | <a href="https://github.com/slevithan/regex-colorizer">GitHub</a></p>
+      <p>
+        &copy; 2010&ndash;2024 Steven Levithan |
+        <a href="https://github.com/slevithan/regex-colorizer">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/c/c2/GitHub_Invertocat_Logo.svg" width="15" height="15" alt="GitHub">
+        </a> |
+        <a href="https://github.com/slevithan/awesome-regex">Awesome Regex</a> |
+        <a href="https://github.com/slevithan/xregexp">XRegExp</a> |
+        <a href="https://www.amazon.com/dp/1449319432/?tag=slev-20">Regular Expressions Cookbook</a> |
+        <a href="https://slev.life/">Lifecurious</a>
+      </p>
     </footer>
   </div>
 
