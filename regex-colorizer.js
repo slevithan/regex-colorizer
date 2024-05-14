@@ -15,17 +15,12 @@ const RegexColorizer = (() => {
 // ------------------------------------
 
   const regexToken = new RegExp(String.raw`
-\[\^?(?:[^\\\]]+|\\.?)*]?
-|
-\\(?:0(?:[0-3][0-7]{0,2}|[4-7][0-7]?)?|[1-9]\d*|x[\dA-Fa-f]{2}|u[\dA-Fa-f]{4}|c[A-Za-z]|k(?:<(?<backrefName>\w+)>)?|.?)
-|
-\((?:\?(?:<(?:[=!]|(?<captureName>[A-Za-z_]\w*)>)|[:=!]?))?
-|
-(?:[?*+]|\{\d+(?:,\d*)?\})\??
-|
-[^.?*+^$[{()|\\]+
-|
-.
+  \[\^?(?:[^\\\]]+|\\.?)*]?
+| \\(?:0(?:[0-3][0-7]{0,2}|[4-7][0-7]?)?|[1-9]\d*|x[\dA-Fa-f]{2}|u[\dA-Fa-f]{4}|c[A-Za-z]|k(?:<(?<backrefName>\w+)>)?|.?)
+| \((?:\?(?:<(?:[=!]|(?<captureName>[A-Za-z_]\w*)>)|[:=!]?))?
+| (?:[?*+]|\{\d+(?:,\d*)?\})\??
+| [^.?*+^$[{()|\\]+
+| .
 `.replace(/\s+/g, ''), 'gs');
   const charClassToken = /[^\\-]+|-|\\(?:[0-3][0-7]{0,2}|[4-7][0-7]?|x[\dA-Fa-f]{2}|u[\dA-Fa-f]{4}|c[A-Za-z]|.?)/gs;
   const charClassParts = /^(?<opening>\[\^?)(?<content>(?:[^\\\]]+|\\.?)*)(?<closing>]?)$/s;
@@ -410,7 +405,7 @@ const RegexColorizer = (() => {
           // - If a named capture appears anywhere (before or after), treat as backreference
           // - Otherwise, it's a literal '\k' plus any following chars
           // - In backreference mode, error if name doesn't appear in a capture (before or after)
-          // With flag u or v, the rules change to only use backreference mode
+          // With flag u or v, the rules change to always use backreference mode
           // Backreference mode
           if (allCaptureNames.size) {
             // Valid
