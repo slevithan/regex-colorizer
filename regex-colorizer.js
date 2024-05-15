@@ -272,7 +272,7 @@ const RegexColorizer = (() => {
    * @param {string} pattern Regex pattern to be colorized.
    * @returns {string}
    */
-  self.colorizeText = pattern => {
+  self.colorizePattern = pattern => {
     let output = '';
     let capturingGroupCount = 0;
     let groupStyleDepth = 0;
@@ -543,7 +543,7 @@ const RegexColorizer = (() => {
     const els = document.querySelectorAll(selector);
     els.forEach(el => {
       el.classList.add(styleId);
-      el.innerHTML = self.colorizeText(el.textContent);
+      el.innerHTML = self.colorizePattern(el.textContent);
     });
   };
 

@@ -72,12 +72,12 @@
     <pre class="code">// Don't run this line if you provide your own stylesheet
 RegexColorizer.loadStyles();
 
-// Defaults to searching for all elements with class 'regex'
+// Defaults to highlighting all elements with class 'regex'
 RegexColorizer.colorizeAll();
 
 // Alternatively, provide a querySelectorAll value for elements to highlight
 RegexColorizer.colorizeAll({selector: '.regex'});</pre>
-    <p>There is also <code>RegexColorizer.colorizeText()</code> that returns HTML with highlighting for the provided regex pattern string.</p>
+    <p>There is also <code>RegexColorizer.colorizePattern()</code> that returns HTML with highlighting for the provided regex pattern string.</p>
 
     <footer>
       <p>
@@ -99,7 +99,7 @@ RegexColorizer.colorizeAll({selector: '.regex'});</pre>
 
     function colorizeInput() {
       const input = document.getElementById('input').value;
-      const html = RegexColorizer.colorizeText(input);
+      const html = RegexColorizer.colorizePattern(input);
       document.getElementById('output').innerHTML = html;
     }
 
