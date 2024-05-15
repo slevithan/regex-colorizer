@@ -5,14 +5,15 @@
 
 body {
   font-family: Calibri, "Helvetica Neue", sans-serif;
-  background-color: #e0e0e0;
+  background-color: #c9e4ff;
 }
 
 #content {
   background-color: #fff;
-  max-width: 60rem;
+  max-width: 65rem;
   padding: 3vw 4.5vw;
   margin: 0 auto;
+  box-shadow: 0 0 0 10px #80c0ff;
 }
 
 #content :first-child {
@@ -98,7 +99,7 @@ button {
 
 footer {
   color: #aaa;
-  margin-top: 30px;
+  margin-top: 40px;
 }
 
 footer a {
