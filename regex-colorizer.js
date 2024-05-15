@@ -39,6 +39,7 @@ const RegexColorizer = (() => {
     UNCLOSED_CLASS: 'Unclosed character class',
     UNQUANTIFIABLE: 'The preceding token is not quantifiable',
   };
+  const styleId = `rx-${(+new Date).toString(36).slice(-5)}`;
   const self = {};
 
 // ------------------------------------
@@ -534,42 +535,46 @@ const RegexColorizer = (() => {
   };
 
   /**
-   * Applies regex syntax highlighting to all elements on the page.
-   * @param {string} [cls='regex'] Class name used by elements to be colorized.
+   * Applies highlighting to all regex elements on the page, replacing their content with HTML.
+   * @param {string} [className] Class used by elements to be colorized.
    */
-  self.colorizeAll = (cls = 'regex') => {
-    const els = document.querySelectorAll(`.${cls}`);
-    els.forEach(el => el.innerHTML = self.colorizeText(el.textContent));
+  self.colorizeAll = (className = 'regex') => {
+    const els = document.querySelectorAll(`.${className}`);
+    els.forEach(el => {
+      el.classList.add(styleId);
+      el.innerHTML = self.colorizeText(el.textContent);
+    });
   };
 
   /**
-   * Adds a stylesheet with the default regex highlighting styles to the page. Don't run this if
-   * you provide your own stylesheet.
-   * @param {string} [cls='regex'] Class name used by elements to be colorized.
+   * Adds the default theme styles to the page. Don't run this if you provide your own stylesheet.
    */
-  self.addStyleSheet = (cls = 'regex') => {
+  self.addStyleSheet = () => {
+    if (document.getElementById(styleId)) {
+      return;
+    }
     const ss = document.createElement('style');
-    ss.id = 'regex-colorizer-ss';
+    ss.id = styleId;
     // See: themes/default.css
     ss.textContent = `
-.${cls} {color: #000; font-family: Consolas, "Source Code Pro", Monospace; white-space: pre-wrap; word-break: break-all; overflow-wrap: anywhere;}
-.${cls} b {font-weight: normal;}
-.${cls} i {font-style: normal;}
-.${cls} u {text-decoration: none;}
-.${cls} * {border-radius: 0.25em;}
-.${cls} span {background: #eee;}
-.${cls} b {background: #80c0ff; color: #092e7f;}
-.${cls} b.bref {background: #86e9ff; color: #0d47c4;}
-.${cls} b.err {background: #e30000; color: #fff; font-style: normal;}
-.${cls} i {background: #e3e3e3; font-style: italic;}
-.${cls} i span {background: #c3c3c3; font-style: normal;}
-.${cls} i b {background: #c3c3c3; color: #222;}
-.${cls} i u {background: #d3d3d3;}
-.${cls} b.g1 {background: #b4fa50; color: #074d0b;}
-.${cls} b.g2 {background: #8cd400; color: #053c08;}
-.${cls} b.g3 {background: #26b809; color: #fff;}
-.${cls} b.g4 {background: #30ea60; color: #125824;}
-.${cls} b.g5 {background: #0c8d15; color: #fff;}
+.${styleId} {color: #000; font-family: Consolas, "Source Code Pro", Monospace; white-space: pre-wrap; word-break: break-all; overflow-wrap: anywhere;}
+.${styleId} b {font-weight: normal;}
+.${styleId} i {font-style: normal;}
+.${styleId} u {text-decoration: none;}
+.${styleId} * {border-radius: 0.25em;}
+.${styleId} span {background: #eee;}
+.${styleId} b {background: #80c0ff; color: #092e7f;}
+.${styleId} b.bref {background: #86e9ff; color: #0d47c4;}
+.${styleId} b.err {background: #e30000; color: #fff; font-style: normal;}
+.${styleId} i {background: #e3e3e3; font-style: italic;}
+.${styleId} i span {background: #c3c3c3; font-style: normal;}
+.${styleId} i b {background: #c3c3c3; color: #222;}
+.${styleId} i u {background: #d3d3d3;}
+.${styleId} b.g1 {background: #b4fa50; color: #074d0b;}
+.${styleId} b.g2 {background: #8cd400; color: #053c08;}
+.${styleId} b.g3 {background: #26b809; color: #fff;}
+.${styleId} b.g4 {background: #30ea60; color: #125824;}
+.${styleId} b.g5 {background: #0c8d15; color: #fff;}
     `;
     document.querySelector('head').appendChild(ss);
   };
