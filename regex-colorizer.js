@@ -1,4 +1,4 @@
-/*! Regex Colorizer 0.4
+/*! Regex Colorizer 0.5
  * (c) 2010-2024 Steven Levithan
  * MIT license
  */
@@ -39,7 +39,7 @@ const RegexColorizer = (() => {
     UNCLOSED_CLASS: 'Unclosed character class',
     UNQUANTIFIABLE: 'The preceding token is not quantifiable',
   };
-  const styleId = `rx-${(+new Date).toString(36).slice(-5)}`;
+  const styleId = `rc-${(+new Date).toString(36).slice(-5)}`;
   const self = {};
 
 // ------------------------------------

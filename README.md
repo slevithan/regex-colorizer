@@ -1,4 +1,4 @@
-﻿# Regex Colorizer 0.4
+﻿# Regex Colorizer 0.5
 
 Add fancy syntax highlighting to your regexes in blogs, docs, and regex testers. Supports the **JavaScript regex flavor** ([ES2024](https://github.com/slevithan/awesome-regex#javascript-regex-evolution)) with **web reality**. In other words, it highlights regexes as web browsers actually interpret them. Syntax changes activated by flags `u` and `v` are not yet supported.
 
@@ -6,7 +6,7 @@ The API is simple. Just give the elements that contain your regexes (`pre`, `cod
 
 Errors are highlighted, along with some edge cases that can cause cross-browser grief. Hover over errors for a description of the problem.
 
-**Size:** 3.4 KB min/gzip, with no dependencies.
+**Size:** 3.9 KB min/gzip (no dependencies).
 
 ## Themes
 
