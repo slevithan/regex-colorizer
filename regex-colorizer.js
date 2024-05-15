@@ -263,6 +263,45 @@ const RegexColorizer = (() => {
     return captureNames;
   }
 
+  /**
+   * Returns an object indicating whether each flag property is enabled. Throws if duplicate,
+   * unknown, or unsupported flags are provided.
+   * @param {string} flags Regex flags.
+   * @returns {Object}
+   */
+  function getFlagsObj(flags) {
+    const flagNames = {
+      d: 'hasIndices',
+      g: 'global',
+      i: 'ignoreCase',
+      m: 'multiline',
+      s: 'dotAll',
+      u: 'unicode',
+      v: 'unicodeSets',
+      y: 'sticky',
+    };
+    const flagsObj = Object.fromEntries(
+      Object.values(flagNames).map(value => [value, false])
+    );
+    const flagsSet = new Set();
+    for (const char of flags) {
+      if (flagsSet.has(char)) {
+        throw new Error(`Duplicate flag: ${char}`);
+      }
+      if (!Object.hasOwn(flagNames, char)) {
+        throw new Error(`Unknown flag: ${char}`);
+      }
+      flagsSet.add(char);
+      flagsObj[flagNames[char]] = true;
+    }
+    if (flagsObj.unicode) {
+      throw new Error ('Flag u is not yet supported');
+    }
+    if (flagsObj.unicodeSets) {
+      throw new Error ('Flag v is not yet supported');
+    }
+  }
+
 // ------------------------------------
 // Public methods
 // ------------------------------------
@@ -270,20 +309,26 @@ const RegexColorizer = (() => {
   /**
    * Returns HTML for displaying the given regex with syntax highlighting.
    * @param {string} pattern Regex pattern to be colorized.
+   * @param {Object} [options]
+   * @param {string} [options.flags]
    * @returns {string}
    */
-  self.colorizePattern = pattern => {
-    let output = '';
-    let capturingGroupCount = 0;
-    let groupStyleDepth = 0;
-    const openGroups = [];
-    const usedCaptureNames = new Set();
+  self.colorizePattern = (pattern, {
+    flags = '',
+  } = {}) => {
+    // TODO: Use to trigger regex syntax changes
+    getFlagsObj(flags);
     // Having any named captures changes the meaning of '\k', so we have to know in advance
     const allCaptureNames = getCaptureNames(pattern);
+    const usedCaptureNames = new Set();
+    const openGroups = [];
+    let capturingGroupCount = 0;
+    let groupStyleDepth = 0;
     let lastToken = {
       quantifiable: false,
       type: type.NONE,
     };
+    let output = '';
 
     // Sequences of unescaped, literal tokens are matched in one step (except '{' when not part of
     // a quantifier, which is matched on its own)
@@ -538,12 +583,16 @@ const RegexColorizer = (() => {
    * Applies highlighting to all regex elements on the page, replacing their content with HTML.
    * @param {Object} [options]
    * @param {string} [options.selector='.regex'] querySelectorAll value for elements to highlight.
+   * @param {string} [options.flags]
    */
-  self.colorizeAll = ({selector = '.regex'} = {}) => {
+  self.colorizeAll = ({
+    selector = '.regex',
+    flags = '',
+  } = {}) => {
     const els = document.querySelectorAll(selector);
     els.forEach(el => {
       el.classList.add(styleId);
-      el.innerHTML = self.colorizePattern(el.textContent);
+      el.innerHTML = self.colorizePattern(el.textContent, {flags});
     });
   };
 

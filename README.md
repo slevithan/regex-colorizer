@@ -18,14 +18,23 @@ Several themes are available as stylesheets, but you don't need to add a stylesh
 // Don't run this line if you provide your own stylesheet
 RegexColorizer.loadStyles();
 
-// Defaults to highlighting all elements with class 'regex'
+// Highlight all elements with class 'regex'
 RegexColorizer.colorizeAll();
 
 // Alternatively, provide a querySelectorAll value for elements to highlight
-RegexColorizer.colorizeAll({selector: '.regex'});
-```
+RegexColorizer.colorizeAll({
+  selector: '.regex',
+});
 
-There is also `RegexColorizer.colorizePattern()` that returns HTML with highlighting for the provided regex pattern string.
+// Optionally provide flags (throws for duplicate, unknown, or unsupported flags)
+RegexColorizer.colorizeAll({
+  flags: 'gimsyd',
+});
+
+// Or just get highlighting HTML for a specific pattern (can provide an options object with flags)
+const pattern = '(?<=\\d).';
+const html = RegexColorizer.colorizePattern(pattern);
+```
 
 ## Demo
 

@@ -9,6 +9,8 @@
   <link id="regexpal-ss" href="../themes/regexpal.css" rel="alternate stylesheet" title="RegexPal">
   <link id="regexbuddy-ss" href="../themes/regexbuddy.css" rel="alternate stylesheet" title="RegexBuddy">
   <link href="styles.css" rel="stylesheet">
+  <link href="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/styles/default.min.css" rel="stylesheet">
+  <script src="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/highlight.min.js"></script>
 </head>
 <body>
   <div id="content">
@@ -69,15 +71,20 @@
 
     <h2>Usage</h2>
     <p>Here's how to highlight all your regexes like you can see running on this page:</p>
-    <pre class="code">// Don't run this line if you provide your own stylesheet
+    <pre><code>// Don't run this line if you provide your own stylesheet
 RegexColorizer.loadStyles();
 
-// Defaults to highlighting all elements with class 'regex'
+// Highlight all elements with class 'regex'
 RegexColorizer.colorizeAll();
 
 // Alternatively, provide a querySelectorAll value for elements to highlight
-RegexColorizer.colorizeAll({selector: '.regex'});</pre>
-    <p>There is also <code>RegexColorizer.colorizePattern()</code> that returns HTML with highlighting for the provided regex pattern string.</p>
+RegexColorizer.colorizeAll({
+  selector: '.regex',
+});
+
+// Or just get highlighting HTML for a specific pattern
+const pattern = '(?&lt;=\\d).';
+const html = RegexColorizer.colorizePattern(pattern);</code></pre>
 
     <footer>
       <p>
@@ -112,6 +119,8 @@ RegexColorizer.colorizeAll({selector: '.regex'});</pre>
       });
       document.getElementById(`${name}-ss`).disabled = false;
     }
+
+    hljs.highlightAll();
   </script>
 </body>
 </html>

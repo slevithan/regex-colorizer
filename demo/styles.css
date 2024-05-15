@@ -68,17 +68,14 @@ pre {
   display: inline-block;
 }
 
-pre.code {
+code {
+  background-color: #eee;
+  padding: 0 3px;
+}
+
+pre code {
   max-width: 100%;
   overflow-x: auto;
-}
-
-code, pre.code {
-  background-color: #eee;
-}
-
-code {
-  padding: 0 3px;
 }
 
 code.regex {
