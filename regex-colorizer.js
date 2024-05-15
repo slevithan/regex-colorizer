@@ -536,10 +536,11 @@ const RegexColorizer = (() => {
 
   /**
    * Applies highlighting to all regex elements on the page, replacing their content with HTML.
-   * @param {string} [className] Class used by elements to be colorized.
+   * @param {Object} [options]
+   * @param {string} [options.selector='.regex'] querySelectorAll value for elements to highlight.
    */
-  self.colorizeAll = (className = 'regex') => {
-    const els = document.querySelectorAll(`.${className}`);
+  self.colorizeAll = ({selector = '.regex'} = {}) => {
+    const els = document.querySelectorAll(selector);
     els.forEach(el => {
       el.classList.add(styleId);
       el.innerHTML = self.colorizeText(el.textContent);

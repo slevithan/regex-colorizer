@@ -18,8 +18,11 @@ Several themes are available as stylesheets, but you don't need to add a stylesh
 // Don't run this line if you provide your own stylesheet
 RegexColorizer.loadStyles();
 
-// Can provide a class name for elements to process (defaults to 'regex')
+// Defaults to searching for all elements with class 'regex'
 RegexColorizer.colorizeAll();
+
+// Alternatively, provide a querySelectorAll value for elements to highlight
+RegexColorizer.colorizeAll({selector: '.regex'});
 ```
 
 There is also `RegexColorizer.colorizeText()` that returns HTML with highlighting for the provided regex pattern string.

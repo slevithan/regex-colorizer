@@ -68,12 +68,15 @@
     </ul>
 
     <h2>Usage</h2>
-    <p>Here's the code running on this page to highlight all of the above regexes:</p>
+    <p>Here's how to highlight all your regexes like you can see running on this page:</p>
     <pre class="code">// Don't run this line if you provide your own stylesheet
 RegexColorizer.loadStyles();
 
-// Can provide a class name for elements to process (defaults to 'regex')
-RegexColorizer.colorizeAll();</pre>
+// Defaults to searching for all elements with class 'regex'
+RegexColorizer.colorizeAll();
+
+// Alternatively, provide a querySelectorAll value for elements to highlight
+RegexColorizer.colorizeAll({selector: '.regex'});</pre>
     <p>There is also <code>RegexColorizer.colorizeText()</code> that returns HTML with highlighting for the provided regex pattern string.</p>
 
     <footer>
