@@ -12,7 +12,7 @@ const RegexColorizer = (() => {
   const regexToken = new RegExp(String.raw`
   \[\^?(?:[^\\\]]+|\\.?)*]?
 | \\(?:0(?:[0-3][0-7]{0,2}|[4-7][0-7]?)?|[1-9]\d*|x[\dA-Fa-f]{2}|u[\dA-Fa-f]{4}|c[A-Za-z]|k(?:<(?<backrefName>\w+)>)?|.?)
-| \((?:\?(?:<(?:[=!]|(?<captureName>[A-Za-z_]\w*)>)|[:=!]?))?
+| \((?:\?(?:<(?:[=!]|(?<captureName>[A-Za-z_]\w*)>)|[:=!]))?
 | (?:[?*+]|\{\d+(?:,\d*)?\})\??
 | [^.?*+^$[{()|\\]+
 | .
@@ -33,12 +33,11 @@ const RegexColorizer = (() => {
     INTERVAL_OVERFLOW: 'Interval quantifier cannot use value over 65,535',
     INTERVAL_REVERSED: 'Interval quantifier range is reversed',
     INVALID_GROUP_NAME: 'Missing or invalid group name',
-    INVALID_GROUP_TYPE: 'Invalid or unsupported group type',
     INVALID_RANGE: 'Reversed or invalid range',
     UNBALANCED_LEFT_PAREN: 'Unclosed grouping',
     UNBALANCED_RIGHT_PAREN: 'No matching opening parenthesis',
     UNCLOSED_CLASS: 'Unclosed character class',
-    UNQUANTIFIABLE: 'Quantifiers must be preceded by a token that can be repeated',
+    UNQUANTIFIABLE: 'The preceding token is not quantifiable',
   };
   const self = {};
 
@@ -302,14 +301,8 @@ const RegexColorizer = (() => {
       } else if (char0 === '(') {
         const captureName = match.groups.captureName;
         groupStyleDepth = groupStyleDepth === 5 ? 1 : groupStyleDepth + 1;
-        if (m === '(?') {
-          openGroups.push({
-            valid: false,
-            opening: m,
-          });
-          output += to.error(m, error.INVALID_GROUP_TYPE);
         // '(?<name>' with a duplicate name
-        } else if (usedCaptureNames.has(captureName)) {
+        if (usedCaptureNames.has(captureName)) {
           openGroups.push({
             valid: false,
             opening: expandEntities(m),
