@@ -1,4 +1,4 @@
-/*! Regex Colorizer 0.5
+/*! Regex Colorizer 1.0.0-pre
  * (c) 2010-2024 Steven Levithan
  * MIT license
  */
@@ -549,7 +549,7 @@ const RegexColorizer = (() => {
   /**
    * Adds the default theme styles to the page. Don't run this if you provide your own stylesheet.
    */
-  self.addStyleSheet = () => {
+  self.loadStyles = () => {
     if (document.getElementById(styleId)) {
       return;
     }

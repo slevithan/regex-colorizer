@@ -1,4 +1,4 @@
-﻿# Regex Colorizer 0.5
+﻿# Regex Colorizer 1.0.0-pre
 
 Add fancy syntax highlighting to your regexes in blogs, docs, and regex testers. Supports the **JavaScript regex flavor** ([ES2024](https://github.com/slevithan/awesome-regex#javascript-regex-evolution)) with **web reality**. In other words, it highlights regexes as web browsers actually interpret them. Syntax changes activated by flags `u` and `v` are not yet supported.
 
@@ -10,13 +10,13 @@ Errors are highlighted, along with some edge cases that can cause cross-browser 
 
 ## Themes
 
-Several themes are available as stylesheets, and you can easily create your own. If you want to use the default theme, you don't need to manually add any styles to your page. The default styles can be loaded using `RegexColorizer.addStyleSheet()`.
+Several themes are available as stylesheets, but you don't need to add a stylesheet to your page to use the default theme. Just run `RegexColorizer.loadStyles()`.
 
 ## Usage
 
 ```js
 // Don't run this line if you provide your own stylesheet
-RegexColorizer.addStyleSheet();
+RegexColorizer.loadStyles();
 
 // Can provide a class name for elements to process (defaults to 'regex')
 RegexColorizer.colorizeAll();
