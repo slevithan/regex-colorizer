@@ -94,6 +94,12 @@ RegexColorizer.colorizeAll();</pre>
   <script>
     RegexColorizer.colorizeAll();
 
+    function colorizeInput() {
+      const input = document.getElementById('input').value;
+      const html = RegexColorizer.colorizeText(input);
+      document.getElementById('output').innerHTML = html;
+    }
+
     function setTheme(name) {
       const themes = ['default', 'nobg', 'regexpal', 'regexbuddy'];
       themes.forEach(theme => {
@@ -102,12 +108,6 @@ RegexColorizer.colorizeAll();</pre>
         document.getElementById(`${theme}-ss`).disabled = true;
       });
       document.getElementById(`${name}-ss`).disabled = false;
-    }
-
-    function colorizeInput() {
-      const input = document.getElementById('input').value;
-      const html = RegexColorizer.colorizeText(input);
-      document.getElementById('output').innerHTML = html;
     }
   </script>
 </body>

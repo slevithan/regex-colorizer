@@ -534,42 +534,42 @@ const RegexColorizer = (() => {
   };
 
   /**
-   * Applies regex syntax highlighting to all elements on the page with the specified class.
+   * Applies regex syntax highlighting to all elements on the page.
    * @param {string} [cls='regex'] Class name used by elements to be colorized.
    */
-  self.colorizeAll = cls => {
-    cls ||= 'regex';
+  self.colorizeAll = (cls = 'regex') => {
     const els = document.querySelectorAll(`.${cls}`);
     els.forEach(el => el.innerHTML = self.colorizeText(el.textContent));
   };
 
   /**
-   * Adds a stylesheet with the default regex highlighting styles to the page. If you provide your
-   * own stylesheet, you don't need to run this.
+   * Adds a stylesheet with the default regex highlighting styles to the page. Don't run this if
+   * you provide your own stylesheet.
+   * @param {string} [cls='regex'] Class name used by elements to be colorized.
    */
-  self.addStyleSheet = () => {
+  self.addStyleSheet = (cls = 'regex') => {
     const ss = document.createElement('style');
     ss.id = 'regex-colorizer-ss';
     // See: themes/default.css
     ss.textContent = `
-.regex {color: #000; font-family: Consolas, "Source Code Pro", Monospace; white-space: pre-wrap; word-break: break-all; overflow-wrap: anywhere;}
-.regex b {font-weight: normal;}
-.regex i {font-style: normal;}
-.regex u {text-decoration: none;}
-.regex * {border-radius: 0.25em;}
-.regex span {background: #eee;}
-.regex b {background: #80c0ff; color: #092e7f;}
-.regex b.bref {background: #86e9ff; color: #0d47c4;}
-.regex b.err {background: #e30000; color: #fff; font-style: normal;}
-.regex i {background: #e3e3e3; font-style: italic;}
-.regex i span {background: #c3c3c3; font-style: normal;}
-.regex i b {background: #c3c3c3; color: #222;}
-.regex i u {background: #d3d3d3;}
-.regex b.g1 {background: #b4fa50; color: #074d0b;}
-.regex b.g2 {background: #8cd400; color: #053c08;}
-.regex b.g3 {background: #26b809; color: #fff;}
-.regex b.g4 {background: #30ea60; color: #125824;}
-.regex b.g5 {background: #0c8d15; color: #fff;}
+.${cls} {color: #000; font-family: Consolas, "Source Code Pro", Monospace; white-space: pre-wrap; word-break: break-all; overflow-wrap: anywhere;}
+.${cls} b {font-weight: normal;}
+.${cls} i {font-style: normal;}
+.${cls} u {text-decoration: none;}
+.${cls} * {border-radius: 0.25em;}
+.${cls} span {background: #eee;}
+.${cls} b {background: #80c0ff; color: #092e7f;}
+.${cls} b.bref {background: #86e9ff; color: #0d47c4;}
+.${cls} b.err {background: #e30000; color: #fff; font-style: normal;}
+.${cls} i {background: #e3e3e3; font-style: italic;}
+.${cls} i span {background: #c3c3c3; font-style: normal;}
+.${cls} i b {background: #c3c3c3; color: #222;}
+.${cls} i u {background: #d3d3d3;}
+.${cls} b.g1 {background: #b4fa50; color: #074d0b;}
+.${cls} b.g2 {background: #8cd400; color: #053c08;}
+.${cls} b.g3 {background: #26b809; color: #fff;}
+.${cls} b.g4 {background: #30ea60; color: #125824;}
+.${cls} b.g5 {background: #0c8d15; color: #fff;}
     `;
     document.querySelector('head').appendChild(ss);
   };
