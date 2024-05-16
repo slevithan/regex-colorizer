@@ -463,9 +463,12 @@ const RegexColorizer = (() => {
             // - Backref 1 followed by '0', if 1-9 capturing groups opened before this point
             // - Otherwise, it's octal character index 10 (since 10 is in octal range 0-377)
             // In fact, octals are not included in ES3, but browsers support them for backcompat.
-            // With flag u or v (not yet supported), the rules change significantly:
+            // Note: Modern browsers seem to have changed at some point to making octals without a
+            // leading zero into backreferences if there are as many backreferences anywhere in the
+            // pattern (`\1(a)\10\1` matches 'a\x08a'). So should probably update this.
+            // With flag u or v, the rules change significantly:
             // - Escaped digits must be a backref or \0 and can't be immediately followed by digits
-            // - An escaped number is a valid backreference if it is not in a character class and
+            // - An escaped number is a valid backreference if it's not in a character class and
             //   there are as many capturing groups anywhere in the pattern (before or after)
             let num = fullEscapedNum;
             let nonBackrefDigits = '';
@@ -521,6 +524,12 @@ const RegexColorizer = (() => {
                 quantifiable: false,
               };
             }
+          // Unicode mode with no named captures: \k is an error
+          } else if (flagsObj.unicode) {
+            output += to.error(expandEntities(m), error.INVALID_BACKREF);
+            lastToken = {
+              quantifiable: false,
+            };
           // Literal mode for \k
           } else {
             output += to.escapedLiteral('\\k') + expandEntities(m.slice(2));
