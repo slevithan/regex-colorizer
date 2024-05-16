@@ -75,6 +75,10 @@ pre.regex, textarea {
   border: 1px dotted #aaa;
 }
 
+.html-output-example .regex {
+  border: none;
+}
+
 pre {
   display: inline-block;
 }

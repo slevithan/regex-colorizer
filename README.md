@@ -1,6 +1,6 @@
 ﻿# Regex Colorizer 1.0.0-pre
 
-Add fancy syntax highlighting to your regexes in blogs, docs, and regex testers. Supports the **JavaScript regex flavor** ([ES2022](https://github.com/slevithan/awesome-regex#javascript-regex-evolution)) with **web reality**. In other words, it highlights regexes as web browsers actually interpret them. ES2024's flag `v` is not yet supported.
+Regex Colorizer adds syntax highlighting to your regular expressions in blogs, docs, regex testers, and other tools. Supports the **JavaScript regex flavor** ([ES2022](https://github.com/slevithan/awesome-regex#javascript-regex-evolution)) with **web reality**. In other words, it highlights regexes as web browsers actually interpret them. ES2024's flag `v` is not yet supported.
 
 The API is simple. Just give the elements that contain your regexes (`pre`, `code`, or whatever) the class `regex`, and call a couple functions (see below).
 
@@ -28,14 +28,29 @@ RegexColorizer.colorizeAll({
 
 // Optionally provide flags
 RegexColorizer.colorizeAll({
+  // Flags provided in CSS classes will override this
   flags: 'u',
 });
 
-// You can also just get highlighting HTML for a specific pattern
-const pattern = '(?<=\\d).';
+// You can also just get the highlighting HTML for a specific pattern
+const pattern = '(?<=\\d)';
 const html = RegexColorizer.colorizePattern(pattern, {
   flags: 'u',
 });
+```
+
+In your HTML:
+
+```html
+<p>
+  This regex is highlighted inline:
+  <code class="regex">(?&lt;=\d)\p{L}\8</code>.
+
+  And here's the same regex but with different rules from flag u:
+  <code class="regex regex-flags-u">(?&lt;=\d)\p{L}\8</code>.
+</p>
+<!-- Can include any valid flags in the class.
+Ex: class="regex regex-flags-gimsuyd" -->
 ```
 
 ## Demo

@@ -25,7 +25,7 @@
       <li><strong>Size:</strong> 3.9 KB min/gzip (no dependencies)</li>
       <li><strong>License:</strong> <a href="https://mit-license.org/">MIT</a></li>
     </ul>
-    <p>Add fancy syntax highlighting to your regexes in blogs, docs, and regex testers. Supports the <strong>JavaScript regex flavor</strong> (<a href="https://github.com/slevithan/awesome-regex#javascript-regex-evolution">ES2022</a>) with <strong>web reality</strong>. In other words, it highlights regexes as web browsers actually interpret them. ES2024's flag <code>v</code> is not yet supported.</p>
+    <p>Regex Colorizer adds syntax highlighting to your regular expressions in blogs, docs, regex testers, and other tools. Supports the <strong>JavaScript regex flavor</strong> (<a href="https://github.com/slevithan/awesome-regex#javascript-regex-evolution">ES2022</a>) with <strong>web reality</strong>. In other words, it highlights regexes as web browsers actually interpret them. ES2024's flag <code>v</code> is not yet supported.</p>
     <p>The API is simple. Just give the elements that contain your regexes (<code>pre</code>, <code>code</code>, or whatever) the class <code>regex</code>, and call a couple functions (see below).</p>
 
     <h2>Examples</h2>
@@ -88,7 +88,7 @@
 
     <h2>Usage</h2>
     <p>Here's how to highlight all your regexes like you can see running on this page:</p>
-    <pre><code>// Don't run this line if you provide your own stylesheet
+    <pre><code class="language-javascript">// Don't run this line if you provide your own stylesheet
 RegexColorizer.loadStyles();
 
 // Highlight all elements with class 'regex'
@@ -101,14 +101,37 @@ RegexColorizer.colorizeAll({
 
 // Optionally provide flags
 RegexColorizer.colorizeAll({
+  // Flags provided in CSS classes will override this
   flags: 'u',
 });
 
-// You can also just get highlighting HTML for a specific pattern
-const pattern = '(?&lt;=\\d).';
+// You can also just get the highlighting HTML for a specific pattern
+const pattern = '(?&lt;=\\d)';
 const html = RegexColorizer.colorizePattern(pattern, {
   flags: 'u',
 });</code></pre>
+
+    <p>In your HTML:</p>
+    <pre><code class="language-xml">&lt;p>
+  This regex is highlighted inline:
+  &lt;code class="regex">(?&amp;lt;=\d)\p{L}\8&lt;/code>.
+
+  And here's the same regex but with different rules from flag u:
+  &lt;code class="regex regex-flags-u">(?&amp;lt;=\d)\p{L}\8&lt;/code>.
+&lt;/p>
+&lt;!-- Can include any valid flags in the class.
+Ex: class="regex regex-flags-gimsuyd" --&gt;</code></pre>
+
+    <p>Output:</p>
+    <div class="html-output-example">
+      <p>
+        This regex is highlighted inline:
+        <code class="regex">(?&lt;=\d)\p{L}\8</code>.
+
+        And here's the same regex but with different rules from flag u:
+        <code class="regex regex-flags-u">(?&lt;=\d)\p{L}\8</code>.
+      </p>
+    </div>
 
     <footer>
       <p>
@@ -129,7 +152,7 @@ const html = RegexColorizer.colorizePattern(pattern, {
     RegexColorizer.colorizeAll();
 
     function colorizeInput() {
-      const pattern = document.getElementById('input').value || ' ';
+      const pattern = document.getElementById('input').value || 'Type a regex pattern';
       const unicodeOn = document.getElementById('flag-u').checked;
       const flags = unicodeOn ? 'u' : '';
       const html = RegexColorizer.colorizePattern(pattern, {
