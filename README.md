@@ -1,6 +1,6 @@
 ﻿# Regex Colorizer 1.0.0-pre
 
-Add fancy syntax highlighting to your regexes in blogs, docs, and regex testers. Supports the **JavaScript regex flavor** ([ES2024](https://github.com/slevithan/awesome-regex#javascript-regex-evolution)) with **web reality**. In other words, it highlights regexes as web browsers actually interpret them. Syntax changes activated by flags `u` and `v` are not yet supported.
+Add fancy syntax highlighting to your regexes in blogs, docs, and regex testers. Supports the **JavaScript regex flavor** ([ES2022](https://github.com/slevithan/awesome-regex#javascript-regex-evolution)) with **web reality**. In other words, it highlights regexes as web browsers actually interpret them. ES2024's flag `v` is not yet supported.
 
 The API is simple. Just give the elements that contain your regexes (`pre`, `code`, or whatever) the class `regex`, and call a couple functions (see below).
 
@@ -21,19 +21,21 @@ RegexColorizer.loadStyles();
 // Highlight all elements with class 'regex'
 RegexColorizer.colorizeAll();
 
-// Alternatively, provide a querySelectorAll value for elements to highlight
+// Or provide a querySelectorAll value for elements to highlight
 RegexColorizer.colorizeAll({
   selector: '.regex',
 });
 
-// Optionally provide flags (throws for duplicate, unknown, or unsupported flags)
+// Optionally provide flags
 RegexColorizer.colorizeAll({
-  flags: 'gimsyd',
+  flags: 'u',
 });
 
-// Or just get highlighting HTML for a specific pattern (can provide an options object with flags)
+// You can also just get highlighting HTML for a specific pattern
 const pattern = '(?<=\\d).';
-const html = RegexColorizer.colorizePattern(pattern);
+const html = RegexColorizer.colorizePattern(pattern, {
+  flags: 'u',
+});
 ```
 
 ## Demo

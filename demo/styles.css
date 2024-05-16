@@ -6,6 +6,7 @@
 body {
   font-family: Calibri, "Helvetica Neue", sans-serif;
   background-color: #c9e4ff;
+  background: repeating-linear-gradient(45deg, #d6ebff, #d6ebff 3px, #c9e4ff 3px, #c9e4ff 10px);
 }
 
 #content {
@@ -49,6 +50,15 @@ textarea {
   white-space: pre-wrap;
   word-break: break-all;
   overflow-wrap: anywhere;
+  border-radius: 0.375em;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: box-shadow 0.2s ease;
+  background-color: #fcfcfc;
+}
+
+textarea:focus {
+  outline: none;
+  box-shadow: 0 0 8px #80c0ff;
 }
 
 pre, code, textarea {
