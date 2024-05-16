@@ -675,7 +675,7 @@ const RegexColorizer = (() => {
       numCharsAdded += to.error('', error.UNBALANCED_LEFT_PAREN).length;
     }
 
-    return output.replace(/\r?\n/g, '<br>');
+    return output;
   };
 
   /**
@@ -690,8 +690,18 @@ const RegexColorizer = (() => {
   } = {}) => {
     const els = document.querySelectorAll(selector);
     els.forEach(el => {
+      let overrideFlags;
+      const flagsClassPrefix = 'regex-flags-';
+      for (const cls of el.classList.values()) {
+        if (cls.startsWith(flagsClassPrefix)) {
+          overrideFlags = cls.slice(flagsClassPrefix.length);
+          break;
+        }
+      }
       el.classList.add(styleId);
-      el.innerHTML = self.colorizePattern(el.textContent, {flags});
+      el.innerHTML = self.colorizePattern(el.textContent, {
+        flags: overrideFlags || flags,
+      });
     });
   };
 
