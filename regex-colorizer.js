@@ -361,10 +361,9 @@ const RegexColorizer = (() => {
     // Validate flags and use for regex syntax changes
     const flagsObj = getFlagsObj(flags);
     const {
-      // Having any named captures changes the meaning of '\k', so we have to know in advance
-      captureNames: allCaptureNames,
-      // In Unicode mode where octals are disabled, numbered backrefs can appear before their
-      // capturing groups, but error if there aren't enough captures in the total pattern
+      // Having any named captures changes the meaning of '\k'
+      captureNames,
+      // Used to determine whether escaped numbers should be treated as backrefs
       totalCaptures,
     } = getPatternDetails(pattern);
     const usedCaptureNames = new Set();
@@ -498,9 +497,9 @@ const RegexColorizer = (() => {
           // - In backreference mode, error if name doesn't appear in a capture (before or after)
           // With flag u or v, the rules change to always use backreference mode
           // Backreference mode for \k
-          if (allCaptureNames.size) {
+          if (captureNames.size) {
             // Valid
-            if (allCaptureNames.has(match.groups.backrefName)) {
+            if (captureNames.has(match.groups.backrefName)) {
               output += to.backref(expandEntities(m));
               lastToken = {
                 quantifiable: true,

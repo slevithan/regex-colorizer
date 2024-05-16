@@ -36,13 +36,15 @@
 
     <h2>Try it</h2>
     <p><textarea id="input" placeholder="Type a regex pattern" spellcheck="false" oninput="colorizeInput(); autoGrow(this)"></textarea></p>
-    <pre id="output" class="regex">Type a regex pattern</pre>
-    <p>
-      <label>
-        <input id="flag-u" type="checkbox" onchange="colorizeInput()">
-        Flag <code>u</code> <small>(<code>unicode</code>)</small>
-      </label>
-    </p>
+    <figure>
+      <pre id="output" class="regex">Type a regex pattern</pre>
+      <figcaption>
+        <label>
+          <input id="flag-u" type="checkbox" onchange="colorizeInput()">
+          Flag <code>u</code> <small>(<code>unicode</code>)</small>
+        </label>
+      </figcaption>
+    </figure>
 
     <h2>Themes</h2>
     <p>Several themes are available as stylesheets, but you don't need to add a stylesheet to your page to use the default theme. Just run <code>RegexColorizer.loadStyles()</code>.</p>
@@ -61,7 +63,8 @@
 [^1-59-6\b-\cX.a-\w!---] \xFF \x \uFF\uFFFF\z\v\1\\\</pre>
     <h3>Octals and backreferences</h3>
     <p>Regex syntax is complex, so Regex Colorizer's highlighting is contextually aware of things that happen forward and backward in the regex. Here's an example of contextually-aware highlighting of regex syntax/behavior in web reality:</p>
-    <pre id="octalsRegex" class="regex">\\ Octals: leading 0 extends length
+    <figure>
+      <pre id="octalsRegex" class="regex">\\ Octals: leading 0 extends length
 \1234 \01234 \00123 \00000 \18 \80 \377 \400
 \\ After a capturing group
 (1) \10 \01000 \2000 \k&lt;1>
@@ -69,12 +72,13 @@
 [ \1234 is the same but not \0123 ]
 \\ Double-digit backreferences
 (2)(3)(?&lt;name>4)(5)(6)(7)(8)(9)(10) \100 \11 \80</pre>
-    <p>
-      <label>
-        <input type="checkbox" onchange="setFlagsFor('octalsRegex', this.checked ? 'u' : '')">
-        Flag <code>u</code> <small>(<code>unicode</code>)</small>
-      </label>
-    </p>
+      <figcaption>
+        <label>
+          <input type="checkbox" onchange="setFlagsFor('octalsRegex', this.checked ? 'u' : '')">
+          Flag <code>u</code> <small>(<code>unicode</code>)</small>
+        </label>
+      </figcaption>
+    </figure>
 
     <p>Some other examples of contextually-aware highlighting:</p>
     <ul class="no-margin-collapse">
@@ -125,7 +129,7 @@ const html = RegexColorizer.colorizePattern(pattern, {
     RegexColorizer.colorizeAll();
 
     function colorizeInput() {
-      const pattern = document.getElementById('input').value;
+      const pattern = document.getElementById('input').value || ' ';
       const unicodeOn = document.getElementById('flag-u').checked;
       const flags = unicodeOn ? 'u' : '';
       const html = RegexColorizer.colorizePattern(pattern, {

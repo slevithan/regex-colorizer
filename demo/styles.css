@@ -12,36 +12,31 @@ body {
 #content {
   background-color: #fff;
   max-width: 65rem;
-  padding: 3vw 4.5vw;
+  padding: 2.8vw 4.5vw;
   margin: 0 auto;
   box-shadow: 0 0 0 10px #80c0ff;
 }
 
-#content :first-child {
-  margin-top: 0;
-}
-
-#content :last-child {
-  margin-bottom: 0;
-}
-
-h1, h2, ul, p, pre {
+h1, h2, ul, p, pre, figure {
   margin-bottom: 12px;
 }
 
 h1, h2 {
   font-family: Cambria, Cochin, Georgia;
-  margin-top: 18px;
 }
 
-.no-margin-collapse {
-  margin-bottom: 30px;
+h2 {
+  margin-top: 18px;
 }
 
 h3 {
   font-size: 1em;
   margin-top: 4px;
   margin-bottom: 2px;
+}
+
+.no-margin-collapse {
+  margin-bottom: 30px;
 }
 
 textarea {
@@ -110,7 +105,7 @@ code.regex {
 button {
   font-weight: bold;
   border-radius: 0.4em;
-  padding: 6px 10px;
+  padding: 0.6em 1em;
   margin-right: 4px;
 }
 
@@ -121,6 +116,10 @@ small {
 footer {
   color: #aaa;
   margin-top: 40px;
+}
+
+footer p:last-of-type {
+  margin-bottom: 0;
 }
 
 footer a {
@@ -142,4 +141,17 @@ footer img:hover {
 
 img {
   vertical-align: middle;
+}
+
+figure:has(pre.regex) {
+  display: inline-block;
+  border-radius: 0.375em;
+  background-color: #f9f9f9;
+  padding: 0.3em;
+}
+
+figure pre.regex {
+  width: 100%;
+  background-color: #fff;
+  margin-bottom: 6px;
 }
