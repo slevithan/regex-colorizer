@@ -444,57 +444,51 @@ const RegexColorizer = (() => {
       } else if (char0 === '\\') {
         // Backreference, octal character code without a leading zero, or a literal '\8' or '\9'
         if (/^[1-9]/.test(char1)) {
-          const fullEscapedNum = +m.slice(1);
-          if (flagsObj.unicode) {
-            if (fullEscapedNum > totalCaptures) {
+          // What does '\10' mean (outside a character class)?
+          // Non-Unicode mode:
+          // - Backref 10, if 10 or more capturing groups anywhere in the pattern
+          // - Octal character index 10, if less than 10 capturing groups anywhere in the pattern
+          //   (since 10 is in octal range 0-377)
+          // Ex: `\1000\1(a)\10\1\1000` matches '\u{40}0a\u{8}a\u{40}0'
+          // Ex: `\3\377(a)\3\377` matches '\u{3}\u{FF}a\u{3}\u{FF}'
+          // Ex: `\3\377()()(a)\3\377` matches '\u{FF}aa\u{FF}'
+          // In fact, octals are not included in ES3+, but browsers support them for backcompat.
+          // With flag u or v (Unicode mode):
+          // - Escaped digits must be a backref or \0 (character index 0) and can't be immediately
+          //   followed by digits
+          // - An escaped number is a valid backreference if there are as many capturing groups
+          //   anywhere in the pattern
+          // Numbered backreference
+          if (+m.slice(1) <= totalCaptures) {
+            output += to.backref(m);
+            lastToken = {
+              quantifiable: true,
+            };
+          } else {
+            // Unicode mode: error
+            if (flagsObj.unicode) {
               output += to.error(m, error.INVALID_BACKREF);
               lastToken = {
                 quantifiable: false,
               };
-            } else {
-              output += to.backref(m);
-              lastToken = {
-                quantifiable: true,
-              };
-            }
-          } else {
-            // What does '\10' mean?
-            // - Backref 10, if 10 or more capturing groups opened before this point
-            // - Backref 1 followed by '0', if 1-9 capturing groups opened before this point
-            // - Otherwise, it's octal character index 10 (since 10 is in octal range 0-377)
-            // In fact, octals are not included in ES3, but browsers support them for backcompat.
-            // Note: Modern browsers seem to have changed at some point to making octals without a
-            // leading zero into backreferences if there are as many backreferences anywhere in the
-            // pattern (`\1(a)\10\1` matches 'a\x08a'). So should probably update this.
-            // With flag u or v, the rules change significantly:
-            // - Escaped digits must be a backref or \0 and can't be immediately followed by digits
-            // - An escaped number is a valid backreference if it's not in a character class and
-            //   there are as many capturing groups anywhere in the pattern (before or after)
-            let num = fullEscapedNum;
-            let nonBackrefDigits = '';
-            while (num > capturingGroupCount) {
-              nonBackrefDigits = `${/\d$/.exec(num)[0]}${nonBackrefDigits}`;
-              // Drop the last digit
-              num = Math.floor(num / 10);
-            }
-            if (num > 0) {
-              output += `${to.backref(`\\${num}`)}${nonBackrefDigits}`;
+            // Octal followed by literal, or escaped literal followed by literal
             } else {
               const {escapedNum, escapedLiteral, literal} =
                 /^\\(?<escapedNum>[0-3][0-7]{0,2}|[4-7][0-7]?|(?<escapedLiteral>[89]))(?<literal>\d*)/.exec(m).groups;
               if (escapedLiteral) {
-                // For \8 and \9 (escaped non-octal digits) when as many capturing groups weren't
-                // opened before this point, they match '8' and '9' (when not using flag u or v).
-                // However, they could be marked as errors since some old browsers handled them
-                // differently (in Firefox 2, they seemed to be equivalent to `(?!)`)
+                // For \8 and \9 (escaped non-octal digits) when as many capturing groups aren't in
+                // the pattern, they match '8' and '9' (when not using flag u or v).
+                // Ex: `\8(a)\8` matches '8a8'
+                // Ex: `\8()()()()()()()(a)\8` matches 'aa'
+                // Ex: `\80()()()()()()()(a)\80` matches '80a80'
                 output += `${to.escapedLiteral(`\\${escapedLiteral}`)}${literal}`;
               } else {
                 output += `${to.metasequence(`\\${escapedNum}`)}${literal}`;
               }
+              lastToken = {
+                quantifiable: true,
+              };
             }
-            lastToken = {
-              quantifiable: true,
-            };
           }
         // Named backreference, \k token with error, or a literal '\k' or '\k<name>'
         } else if (char1 === 'k') {

@@ -46,6 +46,8 @@ h3 {
 
 textarea {
   width: 100%;
+  min-height: 55px;
+  max-height: 155px;
   /* Copy the whitepace/wrapping styles applied to regexes by Regex Colorizer's themes */
   white-space: pre-wrap;
   word-break: break-all;

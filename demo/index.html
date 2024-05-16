@@ -35,9 +35,9 @@
     <pre class="regex">(["'])(?:\\?.)*?\1</pre>
 
     <h2>Try it</h2>
-    <p><label><input id="flag-u" type="checkbox" onchange="colorizeInput()"> Flag <code>u</code> <small>(<code>unicode</code>)</small></label></p>
-    <p><textarea id="input" placeholder="Type a regex pattern" spellcheck="false" oninput="colorizeInput()"></textarea></p>
+    <p><textarea id="input" placeholder="Type a regex pattern" spellcheck="false" oninput="colorizeInput(); autoGrow(this)"></textarea></p>
     <pre id="output" class="regex">Type a regex pattern</pre>
+    <p><label><input id="flag-u" type="checkbox" onchange="colorizeInput()"> Flag <code>u</code> <small>(<code>unicode</code>)</small></label></p>
 
     <h2>Themes</h2>
     <p>Several themes are available as stylesheets, but you don't need to add a stylesheet to your page to use the default theme. Just run <code>RegexColorizer.loadStyles()</code>.</p>
@@ -120,6 +120,11 @@ const html = RegexColorizer.colorizePattern(pattern, {
         flags,
       });
       document.getElementById('output').innerHTML = html;
+    }
+
+    function autoGrow(el) {
+      el.style.height = '0';
+      el.style.height = (el.scrollHeight + 5) + 'px';
     }
 
     function setTheme(name) {
