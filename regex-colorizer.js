@@ -9,15 +9,20 @@ const RegexColorizer = (() => {
 // Private variables
 // ------------------------------------
 
+  const unicodeProperty = '[pP]{(?<property>(?:[A-Za-z_]+=)?[A-Za-z_]+)}';
   const regexToken = new RegExp(String.raw`
   \[\^?(?:[^\\\]]+|\\.?)*]?
-| \\(?:0(?:[0-3][0-7]{0,2}|[4-7][0-7]?)?|[1-9]\d*|x[\dA-Fa-f]{2}|u[\dA-Fa-f]{4}|c[A-Za-z]|k(?:<(?<backrefName>\w+)>)?|.?)
+| \\(?:0(?:[0-3][0-7]{0,2}|[4-7][0-7]?)?|[1-9]\d*|x[\dA-Fa-f]{2}|u[\dA-Fa-f]{4}|c[A-Za-z]|k(?:<(?<backrefName>\w+)>)?|${unicodeProperty}|.?)
 | \((?:\?(?:<(?:[=!]|(?<captureName>[A-Za-z_]\w*)>)|[:=!]))?
 | (?:[?*+]|\{\d+(?:,\d*)?\})\??
-| [^.?*+^$[{()|\\]+
+| [^.?*+^$[\]{}()|\\]+
 | .
-`.replace(/\s+/g, ''), 'gs');
-  const charClassToken = /[^\\-]+|-|\\(?:[0-3][0-7]{0,2}|[4-7][0-7]?|x[\dA-Fa-f]{2}|u[\dA-Fa-f]{4}|c[A-Za-z]|.?)/gs;
+  `.replace(/\s+/g, ''), 'gs');
+  const charClassToken = new RegExp(String.raw`
+  [^\\-]+
+| -
+| \\ (?: [0-3][0-7]{0,2} | [4-7][0-7]? | x[\dA-Fa-f]{2} | u[\dA-Fa-f]{4} | c[A-Za-z] | ${unicodeProperty} | .? )
+  `.replace(/\s+/g, ''), 'gs');
   const charClassParts = /^(?<opening>\[\^?)(?<content>(?:[^\\\]]+|\\.?)*)(?<closing>]?)$/s;
   const quantifier = /^(?:[?*+]|\{\d+(?:,\d*)?\})\??$/;
   const type = {
@@ -29,15 +34,17 @@ const RegexColorizer = (() => {
   const error = {
     DUPLICATE_CAPTURE_NAME: 'Duplicate capture name',
     EMPTY_TOP_ALTERNATIVE: 'Empty alternative effectively truncates the regex here',
-    INCOMPLETE_TOKEN: 'Incomplete regex token',
+    INCOMPLETE_TOKEN: 'Token is incomplete',
     INTERVAL_OVERFLOW: 'Interval quantifier cannot use value over 65,535',
     INTERVAL_REVERSED: 'Interval quantifier range is reversed',
-    INVALID_GROUP_NAME: 'Missing or invalid group name',
+    INVALID_BACKREF: 'Backreference to missing or invalid group',
+    INVALID_ESCAPE: 'Deprecated escaped literal or octal',
     INVALID_RANGE: 'Reversed or invalid range',
+    REQUIRES_ESCAPE: 'Must be escaped unless part of a valid token',
     UNBALANCED_LEFT_PAREN: 'Unclosed grouping',
     UNBALANCED_RIGHT_PAREN: 'No matching opening parenthesis',
     UNCLOSED_CLASS: 'Unclosed character class',
-    UNQUANTIFIABLE: 'The preceding token is not quantifiable',
+    UNQUANTIFIABLE: 'Preceding token is not quantifiable',
   };
   const styleId = `rc-${(+new Date).toString(36).slice(-5)}`;
   const self = {};
@@ -86,9 +93,10 @@ const RegexColorizer = (() => {
    * Returns the character code for the provided regex token. Supports tokens used within character
    * classes only, since that's all it's currently needed for.
    * @param {string} token Regex token.
+   * @param {Object} flagsObj Whether each flag is enabled.
    * @returns {number} Character code of the provided token, or NaN.
    */
-  function getTokenCharCode(token) {
+  function getTokenCharCode(token, flagsObj) {
     // Escape sequence
     if (token.length > 1 && token.charAt(0) === '\\') {
       const t = token.slice(1);
@@ -107,6 +115,9 @@ const RegexColorizer = (() => {
       // Shorthand class or incomplete token
       if (t.length === 1 && 'cuxDdSsWw'.includes(t)) {
         return NaN;
+      }
+      if (/^p/i.test(t)) {
+        return flagsObj.unicode ? NaN : t.charCodeAt(0);
       }
       // Metacharacter representing a single character index, or escaped literal character
       if (t.length === 1) {
@@ -133,9 +144,10 @@ const RegexColorizer = (() => {
    * Character classes have their own syntax rules which are different (sometimes subtly) from
    * surrounding regex syntax. Hence, they're treated as a single token and parsed separately.
    * @param {string} value Character class pattern to be colorized.
+   * @param {Object} flagsObj Whether each flag is enabled.
    * @returns {string}
    */
-  function parseCharClass(value) {
+  function parseCharClass(value, flagsObj) {
     let output = '';
     let lastToken = {
       rangeable: false,
@@ -143,7 +155,6 @@ const RegexColorizer = (() => {
     };
     const {opening, content, closing} = charClassParts.exec(value).groups;
 
-    // Sequences of unescaped, literal tokens are matched in one step
     const matches = content.matchAll(charClassToken);
     for (const match of matches) {
       const m = match[0];
@@ -159,7 +170,10 @@ const RegexColorizer = (() => {
         // ranges, and it's highly unlikely that the user will actually have such a character in
         // their test data, so such tokens are highlighted normally. The remaining metasequences
         // are flagged as errors
-        if (/^\\[cux]$/.test(m)) {
+        if (
+          /^\\[cux]$/.test(m) ||
+          (flagsObj.unicode && /^\\p$/i.test(m))
+        ) {
           output += to.error(m, error.INCOMPLETE_TOKEN);
           lastToken = {
             rangeable: lastToken.type !== type.RANGE_HYPHEN,
@@ -178,12 +192,33 @@ const RegexColorizer = (() => {
         } else if (m === '\\') {
           output += to.error(m, error.INCOMPLETE_TOKEN);
           // Don't need to set lastToken since this is the end of the line
-        // Metasequence representing a single character index, or escaped literal character
+        // Unicode property (with flag u or v) or escaped literal '\p{...}'/'\P{...}'
+        } else if (match.groups.property) {
+          if (flagsObj.unicode) {
+            output += to.metasequence(m);
+            lastToken = {
+              rangeable: lastToken.type !== type.RANGE_HYPHEN,
+              type: type.SHORT_CLASS,
+            };
+          } else {
+            output += to.metasequence(m.slice(0, 2)) + m.slice(2);
+            lastToken = {
+              rangeable: true,
+              charCode: getTokenCharCode(m.at(-1), flagsObj),
+            };
+          }
+        // Unicode mode: escaped literal character or octal with leading zero becomes error
+        } else if (flagsObj.unicode && /^\\(?:[^\^$?*+.|(){}[\]/\-\\0bcdDfnpPrsStuvwWx]|0\d)/.test(m)) {
+          output += to.error(expandEntities(m), error.INVALID_ESCAPE);
+          lastToken = {
+            rangeable: lastToken.type !== type.RANGE_HYPHEN,
+          };
+        // Metasequence representing a single character index
         } else {
           output += to.metasequence(expandEntities(m));
           lastToken = {
             rangeable: lastToken.type !== type.RANGE_HYPHEN,
-            charCode: getTokenCharCode(m),
+            charCode: getTokenCharCode(m, flagsObj),
           };
         }
       // Hyphen (might indicate a range)
@@ -195,12 +230,13 @@ const RegexColorizer = (() => {
           const nextToken = tokenCopy.exec(content);
 
           if (nextToken) {
-            const nextTokenCharCode = getTokenCharCode(nextToken[0]);
+            const nextTokenCharCode = getTokenCharCode(nextToken[0], flagsObj);
             // Hypen for a reverse range (ex: z-a) or shorthand class (ex: \d-x or x-\S)
             if (
               (!isNaN(nextTokenCharCode) && lastToken.charCode > nextTokenCharCode) ||
               lastToken.type === type.SHORT_CLASS ||
-              /^\\[dsw]$/i.test(nextToken[0])
+              /^\\[dsw]$/i.test(nextToken[0]) ||
+              (flagsObj.unicode && nextToken.groups.property)
             ) {
               output += to.error('-', error.INVALID_RANGE);
             // Hyphen creating a valid range
@@ -229,6 +265,7 @@ const RegexColorizer = (() => {
           };
         }
       // Literal character sequence
+      // Sequences of unescaped, literal tokens are matched in one step
       } else {
         output += expandEntities(m);
         lastToken = {
@@ -247,20 +284,27 @@ const RegexColorizer = (() => {
   }
 
   /**
-   * Returns unique capture names used in a regex pattern.
+   * Returns details about the overall pattern.
    * @param {string} pattern Regex pattern to be searched.
-   * @returns {Set} Unique capture names.
+   * @returns {Object}
    */
-  function getCaptureNames(pattern) {
+  function getPatternDetails(pattern) {
     const captureNames = new Set();
+    let totalCaptures = 0;
     const matches = pattern.matchAll(regexToken);
     for (const match of matches) {
       const captureName = match.groups.captureName;
       if (captureName) {
         captureNames.add(captureName);
       }
+      if (/^\((?=\?<(?![=!])|$)/.test(match[0])) {
+        totalCaptures++;
+      }
     }
-    return captureNames;
+    return {
+      captureNames,
+      totalCaptures,
+    };
   }
 
   /**
@@ -294,12 +338,10 @@ const RegexColorizer = (() => {
       flagsSet.add(char);
       flagsObj[flagNames[char]] = true;
     }
-    if (flagsObj.unicode) {
-      throw new Error ('Flag u is not yet supported');
-    }
     if (flagsObj.unicodeSets) {
       throw new Error ('Flag v is not yet supported');
     }
+    return flagsObj;
   }
 
 // ------------------------------------
@@ -316,10 +358,15 @@ const RegexColorizer = (() => {
   self.colorizePattern = (pattern, {
     flags = '',
   } = {}) => {
-    // TODO: Use to trigger regex syntax changes
-    getFlagsObj(flags);
-    // Having any named captures changes the meaning of '\k', so we have to know in advance
-    const allCaptureNames = getCaptureNames(pattern);
+    // Validate flags and use for regex syntax changes
+    const flagsObj = getFlagsObj(flags);
+    const {
+      // Having any named captures changes the meaning of '\k', so we have to know in advance
+      captureNames: allCaptureNames,
+      // In Unicode mode where octals are disabled, numbered backrefs can appear before their
+      // capturing groups, but error if there aren't enough captures in the total pattern
+      totalCaptures,
+    } = getPatternDetails(pattern);
     const usedCaptureNames = new Set();
     const openGroups = [];
     let capturingGroupCount = 0;
@@ -330,8 +377,6 @@ const RegexColorizer = (() => {
     };
     let output = '';
 
-    // Sequences of unescaped, literal tokens are matched in one step (except '{' when not part of
-    // a quantifier, which is matched on its own)
     const matches = pattern.matchAll(regexToken);
     for (const match of matches) {
       const m = match[0];
@@ -339,7 +384,7 @@ const RegexColorizer = (() => {
       const char1 = m.charAt(1);
       // Character class
       if (char0 === '[') {
-        output += to.charClass(parseCharClass(m));
+        output += to.charClass(parseCharClass(m, flagsObj));
         lastToken = {
           quantifiable: true,
         };
@@ -399,40 +444,55 @@ const RegexColorizer = (() => {
       } else if (char0 === '\\') {
         // Backreference, octal character code without a leading zero, or a literal '\8' or '\9'
         if (/^[1-9]/.test(char1)) {
-          // What does '\10' mean?
-          // - Backref 10, if 10 or more capturing groups opened before this point
-          // - Backref 1 followed by '0', if 1-9 capturing groups opened before this point
-          // - Otherwise, it's octal character index 10 (since 10 is in octal range 0-377)
-          // In fact, octals are not included in ES3, but browsers support them for backcompat.
-          // With flag u or v (not yet supported), the rules change significantly:
-          // - Escaped digits must be a backref or \0 and can't be immediately followed by digits
-          // - An escaped number is a valid backreference if it is not in a character class and
-          //   there are as many capturing groups anywhere in the pattern (before or after)
-          let nonBackrefDigits = '';
-          let num = +m.slice(1);
-          while (num > capturingGroupCount) {
-            nonBackrefDigits = `${/\d$/.exec(num)[0]}${nonBackrefDigits}`;
-            // Drop the last digit
-            num = Math.floor(num / 10);
-          }
-          if (num > 0) {
-            output += `${to.backref(`\\${num}`)}${nonBackrefDigits}`;
-          } else {
-            const {escapedNum, escapedLiteral, literal} =
-              /^\\(?<escapedNum>[0-3][0-7]{0,2}|[4-7][0-7]?|(?<escapedLiteral>[89]))(?<literal>\d*)/.exec(m).groups;
-            if (escapedLiteral) {
-              // For \8 and \9 (escaped non-octal digits) when as many capturing groups weren't
-              // opened before this point, they match '8' and '9' (when not using flag u or v).
-              // However, they could be marked as errors since some old browsers handled them
-              // differently (in Firefox 2, they seemed to be equivalent to `(?!)`)
-              output += `${to.escapedLiteral(`\\${escapedLiteral}`)}${literal}`;
+          const fullEscapedNum = +m.slice(1);
+          if (flagsObj.unicode) {
+            if (fullEscapedNum > totalCaptures) {
+              output += to.error(m, error.INVALID_BACKREF);
+              lastToken = {
+                quantifiable: false,
+              };
             } else {
-              output += `${to.metasequence(`\\${escapedNum}`)}${literal}`;
+              output += to.backref(m);
+              lastToken = {
+                quantifiable: true,
+              };
             }
+          } else {
+            // What does '\10' mean?
+            // - Backref 10, if 10 or more capturing groups opened before this point
+            // - Backref 1 followed by '0', if 1-9 capturing groups opened before this point
+            // - Otherwise, it's octal character index 10 (since 10 is in octal range 0-377)
+            // In fact, octals are not included in ES3, but browsers support them for backcompat.
+            // With flag u or v (not yet supported), the rules change significantly:
+            // - Escaped digits must be a backref or \0 and can't be immediately followed by digits
+            // - An escaped number is a valid backreference if it is not in a character class and
+            //   there are as many capturing groups anywhere in the pattern (before or after)
+            let num = fullEscapedNum;
+            let nonBackrefDigits = '';
+            while (num > capturingGroupCount) {
+              nonBackrefDigits = `${/\d$/.exec(num)[0]}${nonBackrefDigits}`;
+              // Drop the last digit
+              num = Math.floor(num / 10);
+            }
+            if (num > 0) {
+              output += `${to.backref(`\\${num}`)}${nonBackrefDigits}`;
+            } else {
+              const {escapedNum, escapedLiteral, literal} =
+                /^\\(?<escapedNum>[0-3][0-7]{0,2}|[4-7][0-7]?|(?<escapedLiteral>[89]))(?<literal>\d*)/.exec(m).groups;
+              if (escapedLiteral) {
+                // For \8 and \9 (escaped non-octal digits) when as many capturing groups weren't
+                // opened before this point, they match '8' and '9' (when not using flag u or v).
+                // However, they could be marked as errors since some old browsers handled them
+                // differently (in Firefox 2, they seemed to be equivalent to `(?!)`)
+                output += `${to.escapedLiteral(`\\${escapedLiteral}`)}${literal}`;
+              } else {
+                output += `${to.metasequence(`\\${escapedNum}`)}${literal}`;
+              }
+            }
+            lastToken = {
+              quantifiable: true,
+            };
           }
-          lastToken = {
-            quantifiable: true,
-          };
         // Named backreference, \k token with error, or a literal '\k' or '\k<name>'
         } else if (char1 === 'k') {
           // What does '\k' or '\k<name>' mean?
@@ -440,7 +500,7 @@ const RegexColorizer = (() => {
           // - Otherwise, it's a literal '\k' plus any following chars
           // - In backreference mode, error if name doesn't appear in a capture (before or after)
           // With flag u or v, the rules change to always use backreference mode
-          // Backreference mode
+          // Backreference mode for \k
           if (allCaptureNames.size) {
             // Valid
             if (allCaptureNames.has(match.groups.backrefName)) {
@@ -450,7 +510,7 @@ const RegexColorizer = (() => {
               };
             // References a missing or invalid (ex: \k<1>) named group
             } else if (m.endsWith('>')) {
-              output += to.error(expandEntities(m), error.INVALID_GROUP_NAME);
+              output += to.error(expandEntities(m), error.INVALID_BACKREF);
               lastToken = {
                 quantifiable: false,
               };
@@ -461,14 +521,24 @@ const RegexColorizer = (() => {
                 quantifiable: false,
               };
             }
-          // Literal mode
+          // Literal mode for \k
           } else {
             output += to.escapedLiteral('\\k') + expandEntities(m.slice(2));
             lastToken = {
               quantifiable: true,
             };
           }
-        // Metasequence
+        // Unicode property (with flag u or v) or escaped literal '\p{...}'/'\P{...}'
+        } else if (match.groups.property) {
+          if (flagsObj.unicode) {
+            output += to.metasequence(m);
+          } else {
+            output += to.escapedLiteral(`\\${char1}`) + m.slice(2);
+          }
+          lastToken = {
+            quantifiable: true,
+          };
+        // Metasequence (shorthand class, word boundary, control character, octal with a leading zero, etc.)
         } else if (/^[0bBcdDfnrsStuvwWx]/.test(char1)) {
           // Browsers differ on how they handle:
           // - '\c', when not followed by A-Z or a-z
@@ -486,6 +556,12 @@ const RegexColorizer = (() => {
             lastToken = {
               quantifiable: false,
             };
+          // Unicode mode: octal with a leading zero
+          } else if (flagsObj.unicode && /^\\0\d/.test(m)) {
+            output += to.error(m, error.INVALID_ESCAPE);
+            lastToken = {
+              quantifiable: false,
+            };
           // Quantifiable metasequence
           } else {
             output += to.metasequence(m);
@@ -499,10 +575,21 @@ const RegexColorizer = (() => {
           // Don't need to set lastToken since this is the end of the line
         // Escaped literal character
         } else {
-          output += to.escapedLiteral(expandEntities(m));
-          lastToken = {
-            quantifiable: true,
-          };
+          if (flagsObj.unicode && !'{}]'.includes(char1)) {
+            if (char1 === 'p' || char1 === 'P') {
+              output += to.error(m, error.INCOMPLETE_TOKEN);
+            } else {
+              output += to.error(expandEntities(m), error.INVALID_ESCAPE);
+            }
+            lastToken = {
+              quantifiable: false,
+            };
+          } else {
+            output += to.escapedLiteral(expandEntities(m));
+            lastToken = {
+              quantifiable: true,
+            };
+          }
         }
       // Quantifier
       } else if (quantifier.test(m)) {
@@ -551,7 +638,16 @@ const RegexColorizer = (() => {
         lastToken = {
           quantifiable: true,
         };
+      } else if (flagsObj.unicode && '{}]'.includes(m)) {
+        output += to.error(m, error.REQUIRES_ESCAPE);
+        lastToken = {
+          quantifiable: false,
+        };
       // Literal character sequence
+      // Sequences of unescaped, literal tokens are matched in one step, except the following which
+      // are matched on their own:
+      // - '{' when not part of a quantifier (non-Unicode mode: allow `{{1}`; Unicode mode: error)
+      // - '}' and ']' (Unicode mode: error)
       } else {
         output += expandEntities(m);
         lastToken = {

@@ -35,6 +35,7 @@
     <pre class="regex">(["'])(?:\\?.)*?\1</pre>
 
     <h2>Try it</h2>
+    <p><label><input id="flag-u" type="checkbox" onchange="colorizeInput()"> Flag <code>u</code> <small>(<code>unicode</code>)</small></label></p>
     <p><textarea id="input" placeholder="Type a regex pattern" spellcheck="false" oninput="colorizeInput()"></textarea></p>
     <pre id="output" class="regex">Type a regex pattern</pre>
 
@@ -106,7 +107,11 @@ const html = RegexColorizer.colorizePattern(pattern);</code></pre>
 
     function colorizeInput() {
       const input = document.getElementById('input').value;
-      const html = RegexColorizer.colorizePattern(input);
+      const unicode = document.getElementById('flag-u').checked;
+      const flags = `${unicode ? 'u' : ''}`;
+      const html = RegexColorizer.colorizePattern(input, {
+        flags,
+      });
       document.getElementById('output').innerHTML = html;
     }
 

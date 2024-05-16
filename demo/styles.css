@@ -38,7 +38,7 @@ h1, h2 {
 }
 
 h3 {
-  font-size: 1rem;
+  font-size: 1em;
   margin-top: 4px;
   margin-bottom: 2px;
 }
@@ -53,11 +53,11 @@ textarea {
 
 pre, code, textarea {
   font-family: Consolas, "Source Code Pro", Monospace;
-  font-size: 1rem;
+  font-size: 1em;
 }
 
 pre, code {
-  border-radius: 0.375rem;
+  border-radius: 0.375em;
 }
 
 pre.regex, textarea {
@@ -97,9 +97,13 @@ code.regex {
 
 button {
   font-weight: bold;
-  border-radius: 0.4rem;
+  border-radius: 0.4em;
   padding: 6px 10px;
   margin-right: 4px;
+}
+
+small {
+  font-size: 0.8em;
 }
 
 footer {
