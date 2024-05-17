@@ -10,7 +10,7 @@ const RegexColorizer = (() => {
 // ------------------------------------
 
   const unicodePropX = '[pP] { (?<property> (?: [A-Za-z_]+ = )? [A-Za-z_]+ ) }';
-  const cuxTokenX = 'c [A-Za-z] | u [\dA-Fa-f]{4} | x [\dA-Fa-f]{2}';
+  const cuxTokenX = String.raw`c [A-Za-z] | u (?: [\dA-Fa-f]{4} | { [\dA-Fa-f]+ } ) | x [\dA-Fa-f]{2}`;
   const octalRange = '[0-3][0-7]{0,2}|[4-7][0-7]?';
   const regexToken = new RegExp(String.raw`
   \[\^?(?:[^\\\]]+|\\.?)*]?
@@ -22,8 +22,8 @@ const RegexColorizer = (() => {
   `.replace(/\s+/g, ''), 'gs');
   const charClassToken = new RegExp(String.raw`
   [^\\-]+
-| -
 | \\ (?: ${octalRange} | ${cuxTokenX} | ${unicodePropX} | .? )
+| -
   `.replace(/\s+/g, ''), 'gs');
   const charClassParts = /^(?<opening>\[\^?)(?<content>(?:[^\\\]]+|\\.?)*)(?<closing>]?)$/s;
   const quantifier = /^(?:[?*+]|\{\d+(?:,\d*)?\})\??$/;
@@ -37,6 +37,7 @@ const RegexColorizer = (() => {
     DUPLICATE_CAPTURE_NAME: 'Duplicate capture name',
     EMPTY_TOP_ALTERNATIVE: 'Empty alternative effectively truncates the regex here',
     INCOMPLETE_TOKEN: 'Token is incomplete',
+    INDEX_OVERFLOW: 'Character index cannot use value over 10FFFF',
     INTERVAL_OVERFLOW: 'Interval quantifier cannot use value over 65,535',
     INTERVAL_REVERSED: 'Interval quantifier range is reversed',
     INVALID_BACKREF: 'Backreference to missing or invalid group',
@@ -95,10 +96,9 @@ const RegexColorizer = (() => {
    * Returns the character code for the provided regex token. Supports tokens used within character
    * classes only, since that's all it's currently needed for.
    * @param {string} token Regex token.
-   * @param {Object} flagsObj Whether each flag is enabled.
    * @returns {number} Character code of the provided token, or NaN.
    */
-  function getTokenCharCode(token, flagsObj) {
+  function getTokenCharCode(token) {
     // Escape sequence
     if (token.length > 1 && token.charAt(0) === '\\') {
       const t = token.slice(1);
@@ -110,6 +110,10 @@ const RegexColorizer = (() => {
       if (/^(?:x[\dA-Fa-f]{2}|u[\dA-Fa-f]{4})$/.test(t)) {
         return parseInt(t.slice(1), 16);
       }
+      // '\u{...}'
+      if (/^u{[\dA-Fa-f]+}$/.test(t)) {
+        return parseInt(t.slice(2, -1), 16);
+      }
       // One to three digit octal character code up to 377 (0xFF)
       if (new RegExp(`^(?:${octalRange})$`).test(t)) {
         return parseInt(t, 8);
@@ -117,9 +121,6 @@ const RegexColorizer = (() => {
       // Shorthand class or incomplete token
       if (t.length === 1 && 'cuxDdSsWw'.includes(t)) {
         return NaN;
-      }
-      if (/^p/i.test(t)) {
-        return flagsObj.unicode ? NaN : t.charCodeAt(0);
       }
       // Metacharacter representing a single character index, or escaped literal character
       if (t.length === 1) {
@@ -172,13 +173,18 @@ const RegexColorizer = (() => {
         // ranges, and it's highly unlikely that the user will actually have such a character in
         // their test data, so such tokens are highlighted normally. The remaining metasequences
         // are flagged as errors
-        if (
-          /^\\[cux]$/.test(m) ||
-          (flagsObj.unicode && /^\\p$/i.test(m))
-        ) {
+        // '\c', '\u', '\x'
+        if (/^\\[cux]$/.test(m)) {
           output += to.error(m, error.INCOMPLETE_TOKEN);
           lastToken = {
             rangeable: lastToken.type !== type.RANGE_HYPHEN,
+          };
+        // '\p' or '\P' in Unicode mode
+        } else if (flagsObj.unicode && /^\\p$/i.test(m)) {
+          output += to.error(m, error.INCOMPLETE_TOKEN);
+          lastToken = {
+            rangeable: lastToken.type !== type.RANGE_HYPHEN,
+            type: type.SHORT_CLASS,
           };
         // Shorthand class (matches more than one character index)
         } else if (/^\\[dsw]$/i.test(m)) {
@@ -194,7 +200,7 @@ const RegexColorizer = (() => {
         } else if (m === '\\') {
           output += to.error(m, error.INCOMPLETE_TOKEN);
           // Don't need to set lastToken since this is the end of the line
-        // Unicode property (with flag u or v) or escaped literal: '\p{...}' or '\P{...}'
+        // '\p{...}' or '\P{...}': Unicode property in Unicode mode, or escaped literal '\p' and following chars
         } else if (match.groups.property) {
           if (flagsObj.unicode) {
             output += to.metasequence(m);
@@ -206,7 +212,7 @@ const RegexColorizer = (() => {
             output += to.metasequence(m.slice(0, 2)) + m.slice(2);
             lastToken = {
               rangeable: true,
-              charCode: getTokenCharCode(m.at(-1), flagsObj),
+              charCode: getTokenCharCode('}'),
             };
           }
         // Unicode mode: escaped literal character or octal with leading zero becomes error
@@ -215,12 +221,30 @@ const RegexColorizer = (() => {
           lastToken = {
             rangeable: lastToken.type !== type.RANGE_HYPHEN,
           };
+        // '\u{...}'
+        } else if (m.startsWith('\\u{')) {
+          if (flagsObj.unicode) {
+            const charCode = getTokenCharCode(m);
+            output += charCode <= 0x10FFFF ?
+              to.metasequence(m) :
+              to.error(m, error.INDEX_OVERFLOW);
+            lastToken = {
+              rangeable: lastToken.type !== type.RANGE_HYPHEN,
+              charCode,
+            };
+          } else {
+            output += to.error('\\u', error.INCOMPLETE_TOKEN) + m.slice(2);
+            lastToken = {
+              rangeable: true,
+              charCode: getTokenCharCode('}'),
+            };
+          }
         // Metasequence representing a single character index
         } else {
           output += to.metasequence(expandEntities(m));
           lastToken = {
             rangeable: lastToken.type !== type.RANGE_HYPHEN,
-            charCode: getTokenCharCode(m, flagsObj),
+            charCode: getTokenCharCode(m),
           };
         }
       // Hyphen (might indicate a range)
@@ -232,7 +256,7 @@ const RegexColorizer = (() => {
           const nextToken = tokenCopy.exec(content);
 
           if (nextToken) {
-            const nextTokenCharCode = getTokenCharCode(nextToken[0], flagsObj);
+            const nextTokenCharCode = getTokenCharCode(nextToken[0]);
             // Hypen for a reverse range (ex: z-a) or shorthand class (ex: \d-x or x-\S)
             if (
               (!isNaN(nextTokenCharCode) && lastToken.charCode > nextTokenCharCode) ||
@@ -532,7 +556,7 @@ const RegexColorizer = (() => {
               quantifiable: true,
             };
           }
-        // Unicode property (with flag u or v) or escaped literal: '\p{...}' or '\P{...}'
+        // '\p{...}' or '\P{...}': Unicode property in Unicode mode, or escaped literal '\p' and following chars
         } else if (match.groups.property) {
           if (flagsObj.unicode) {
             output += to.metasequence(m);
