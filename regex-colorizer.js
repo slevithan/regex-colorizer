@@ -540,6 +540,13 @@ const RegexColorizer = (() => {
           lastToken = {
             quantifiable: true,
           };
+        // Incomplete Unicode property in Unicode mode
+        // This condition isn't required here but allows for a more specific error
+        } else if (flagsObj.unicode && 'pP'.includes(char1)) {
+          output += to.error(m, error.INCOMPLETE_TOKEN);
+          lastToken = {
+            quantifiable: false,
+          };
         // Metasequence (shorthand class, word boundary, control character, octal with a leading zero, etc.)
         } else if (/^[0bBcdDfnrsStuvwWx]/.test(char1)) {
           // Browsers differ on how they handle:
