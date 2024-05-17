@@ -39,6 +39,21 @@ h3 {
   margin-bottom: 30px;
 }
 
+div.info {
+  border-left: 10px solid #80c0ff;
+  border-radius: 0.375em;
+  background-color: #d6ebff;
+  padding: 0.5em;
+}
+
+div.info p {
+  margin: 0;
+}
+
+div.info code {
+  background-color: #80c0ff;
+}
+
 textarea {
   width: 100%;
   min-height: 55px;
@@ -158,4 +173,8 @@ figure pre.regex {
   width: 100%;
   background-color: #fff;
   margin-bottom: 6px;
+}
+
+.hidden {
+  display: none;
 }

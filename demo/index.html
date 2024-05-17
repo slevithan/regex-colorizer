@@ -47,13 +47,19 @@
     </figure>
 
     <h2>Themes</h2>
-    <p>Several themes are available as stylesheets, but you don't need to add a stylesheet to your page to use the default theme. Just run <code>RegexColorizer.loadStyles()</code>.</p>
-    <p class="no-margin-collapse">
+    <p>Several themes are available as stylesheets.</p>
+    <p>
       <button id="default-btn" onclick="setTheme('default')" disabled>Default</button>
       <button id="nobg-btn" onclick="setTheme('nobg')">No BG</button>
       <button id="regexpal-btn" onclick="setTheme('regexpal')">RegexPal</button>
       <button id="regexbuddy-btn" onclick="setTheme('regexbuddy')">RegexBuddy</button>
     </p>
+    <div class="info no-margin-collapse">
+      <p id="info-theme-default">You don't need to add a stylesheet to your page to use the default theme. Just run <code>RegexColorizer.loadStyles()</code>.</p>
+      <p id="info-theme-nobg" class="hidden">The No BG theme avoids background colors as part of highlighting.</p>
+      <p id="info-theme-regexpal" class="hidden">In 2007, <a href="https://stevenlevithan.com/regexpal/">RegexPal</a> was the first online regex tester with live syntax highlighting. Regex Colorizer started out by extracting RegexPal's highlighting code into a standalone library.</p>
+      <p id="info-theme-regexbuddy" class="hidden">OG <a href="https://www.regexbuddy.com/">RegexBuddy</a>'s highlighting styles. RegexBuddy inspired RegexPal and numerous regex testers that came after it.</p>
+    </div>
 
     <h2>More examples</h2>
     <h3>Regex with errors</h3>
@@ -169,8 +175,9 @@ someElement.innerHTML = RegexColorizer.colorizePattern(pattern, {
       const themes = ['default', 'nobg', 'regexpal', 'regexbuddy'];
       themes.forEach(theme => {
         document.getElementById(`${theme}-btn`).disabled = theme === name;
-        // Need to disable all before enabling the active stylesheet
+        // Need to disable all stylesheets before enabling the active one
         document.getElementById(`${theme}-ss`).disabled = true;
+        document.getElementById(`info-theme-${theme}`).classList.toggle('hidden', name !== theme);
       });
       document.getElementById(`${name}-ss`).disabled = false;
     }
