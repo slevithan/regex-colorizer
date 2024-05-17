@@ -26,7 +26,7 @@
       <li><strong>License:</strong> <a href="https://mit-license.org/">MIT</a></li>
     </ul>
     <p>Regex Colorizer adds syntax highlighting to your regular expressions in blogs, docs, regex testers, and other tools. Supports the <strong>JavaScript regex flavor</strong> (<a href="https://github.com/slevithan/awesome-regex#javascript-regex-evolution">ES2022</a>) with <strong>web reality</strong>. In other words, it highlights regexes as web browsers actually interpret them. ES2024's flag <code>v</code> is not yet supported.</p>
-    <p>The API is simple. Just give the elements that contain your regexes (<code>pre</code>, <code>code</code>, or whatever) the class <code>regex</code>, and call a couple functions (see below).</p>
+    <p>The API is simple. Just give the elements that contain your regexes (<code>pre</code>, <code>code</code>, or whatever) the class <code>regex</code>, and call <code>RegexColorizer.colorizeAll()</code>. See more usage examples below.</p>
 
     <h2>Examples</h2>
     <h3>SSN, excluding invalid ranges</h3>
@@ -62,16 +62,18 @@
 ((((?:((a))b.c)d|x(y){65536,}))))
 [^1-59-6\b-\cX.a-\w!---] \xFF \x \uFF\uFFFF\z\v\1\\\</pre>
     <h3>Octals and backreferences</h3>
-    <p>Regex syntax is complex, so Regex Colorizer's highlighting is contextually aware of things that happen forward and backward in the regex. Here's an example of contextually-aware highlighting of regex syntax/behavior in web reality:</p>
+    <p>Regex syntax is complex, so Regex Colorizer's highlighting is contextually aware of things that happen forward and backward in the regex. Here's an example of contextually-aware highlighting of regex syntax:</p>
     <figure>
-      <pre id="octalsRegex" class="regex">\\ Octals: leading 0 extends length
-\1234 \01234 \00123 \00000 \18 \80 \377 \400
-\\ After a capturing group
-(1) \10 \01000 \2000 \k&lt;1>
-\\ Different rules for leading 0 in character classes
-[ \1234 is the same but not \0123 ]
-\\ Double-digit backreferences
-(2)(3)(?&lt;name>4)(5)(6)(7)(8)(9)(10) \100 \11 \80</pre>
+      <pre id="octalsRegex" class="regex">\+ Escapes are backreferences if num &lt;= capturing groups
+\1 \8 \9 \10 \k&lt;1> \k&lt;name>
+\+ Octals: leading 0 extends length
+\11 \100 \1234 \01234 \00123 \0 \00 \00000 \377 \400
+\+ Non-octal digits
+\18 \80 \90
+\+ Leading 0 in character class doesn't extend length
+[ \1234 is the same but not \0123; no backrefs \1 ]
+\+ Capturing groups can appear after their backrefs
+(1)(2)(?&lt;name>3)(4)(5)(6)(7)(8)(9)(10)</pre>
       <figcaption>
         <label>
           <input type="checkbox" onchange="setFlagsFor('octalsRegex', this.checked ? 'u' : '')">
