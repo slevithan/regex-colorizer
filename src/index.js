@@ -1,4 +1,4 @@
-/*! Regex Colorizer 1.0.0-pre
+/*! Regex Colorizer 1.0.0
  * (c) 2010-2024 Steven Levithan
  * MIT license
  */
