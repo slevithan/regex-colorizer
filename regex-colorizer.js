@@ -192,7 +192,7 @@ const RegexColorizer = (() => {
         } else if (m === '\\') {
           output += to.error(m, error.INCOMPLETE_TOKEN);
           // Don't need to set lastToken since this is the end of the line
-        // Unicode property (with flag u or v) or escaped literal '\p{...}'/'\P{...}'
+        // Unicode property (with flag u or v) or escaped literal: '\p{...}' or '\P{...}'
         } else if (match.groups.property) {
           if (flagsObj.unicode) {
             output += to.metasequence(m);
@@ -208,7 +208,7 @@ const RegexColorizer = (() => {
             };
           }
         // Unicode mode: escaped literal character or octal with leading zero becomes error
-        } else if (flagsObj.unicode && /^\\(?:[^\^$?*+.|(){}[\]/\-\\0bcdDfnpPrsStuvwWx]|0\d)/.test(m)) {
+        } else if (flagsObj.unicode && /^\\(?:[^\^$?*+.|(){}[\]\\/\-0bcdDfnpPrsStuvwWx]|0\d)/.test(m)) {
           output += to.error(expandEntities(m), error.INVALID_ESCAPE);
           lastToken = {
             rangeable: lastToken.type !== type.RANGE_HYPHEN,
@@ -530,7 +530,7 @@ const RegexColorizer = (() => {
               quantifiable: true,
             };
           }
-        // Unicode property (with flag u or v) or escaped literal '\p{...}'/'\P{...}'
+        // Unicode property (with flag u or v) or escaped literal: '\p{...}' or '\P{...}'
         } else if (match.groups.property) {
           if (flagsObj.unicode) {
             output += to.metasequence(m);
@@ -575,23 +575,18 @@ const RegexColorizer = (() => {
         } else if (m === '\\') {
           output += to.error(m, error.INCOMPLETE_TOKEN);
           // Don't need to set lastToken since this is the end of the line
-        // Escaped literal character
+        // Escaped literal character in Unicode mode
+        } else if (flagsObj.unicode && /^[^\^$?*+.|(){}[\]\\/]$/.test(char1)) {
+          output += to.error(expandEntities(m), error.INVALID_ESCAPE);
+          lastToken = {
+            quantifiable: false,
+          };
+        // Escaped special or literal character
         } else {
-          if (flagsObj.unicode && !'{}]'.includes(char1)) {
-            if (char1 === 'p' || char1 === 'P') {
-              output += to.error(m, error.INCOMPLETE_TOKEN);
-            } else {
-              output += to.error(expandEntities(m), error.INVALID_ESCAPE);
-            }
-            lastToken = {
-              quantifiable: false,
-            };
-          } else {
-            output += to.escapedLiteral(expandEntities(m));
-            lastToken = {
-              quantifiable: true,
-            };
-          }
+          output += to.escapedLiteral(expandEntities(m));
+          lastToken = {
+            quantifiable: true,
+          };
         }
       // Quantifier
       } else if (quantifier.test(m)) {
@@ -640,6 +635,7 @@ const RegexColorizer = (() => {
         lastToken = {
           quantifiable: true,
         };
+      // Unicode mode: Unescaped '{', '}', ']'
       } else if (flagsObj.unicode && '{}]'.includes(m)) {
         output += to.error(m, error.REQUIRES_ESCAPE);
         lastToken = {
