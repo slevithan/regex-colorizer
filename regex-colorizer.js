@@ -9,10 +9,12 @@ const RegexColorizer = (() => {
 // Private variables
 // ------------------------------------
 
-  const unicodeProperty = '[pP]{(?<property>(?:[A-Za-z_]+=)?[A-Za-z_]+)}';
+  const unicodePropX = '[pP] { (?<property> (?: [A-Za-z_]+ = )? [A-Za-z_]+ ) }';
+  const cuxTokenX = 'c [A-Za-z] | u [\dA-Fa-f]{4} | x [\dA-Fa-f]{2}';
+  const octalRange = '[0-3][0-7]{0,2}|[4-7][0-7]?';
   const regexToken = new RegExp(String.raw`
   \[\^?(?:[^\\\]]+|\\.?)*]?
-| \\(?:0(?:[0-3][0-7]{0,2}|[4-7][0-7]?)?|[1-9]\d*|x[\dA-Fa-f]{2}|u[\dA-Fa-f]{4}|c[A-Za-z]|k(?:<(?<backrefName>\w+)>)?|${unicodeProperty}|.?)
+| \\(?:0(?:${octalRange})?|[1-9]\d*|${cuxTokenX}|k(?:<(?<backrefName>\w+)>)?|${unicodePropX}|.?)
 | \((?:\?(?:<(?:[=!]|(?<captureName>[A-Za-z_]\w*)>)|[:=!]))?
 | (?:[?*+]|\{\d+(?:,\d*)?\})\??
 | [^.?*+^$[\]{}()|\\]+
@@ -21,7 +23,7 @@ const RegexColorizer = (() => {
   const charClassToken = new RegExp(String.raw`
   [^\\-]+
 | -
-| \\ (?: [0-3][0-7]{0,2} | [4-7][0-7]? | x[\dA-Fa-f]{2} | u[\dA-Fa-f]{4} | c[A-Za-z] | ${unicodeProperty} | .? )
+| \\ (?: ${octalRange} | ${cuxTokenX} | ${unicodePropX} | .? )
   `.replace(/\s+/g, ''), 'gs');
   const charClassParts = /^(?<opening>\[\^?)(?<content>(?:[^\\\]]+|\\.?)*)(?<closing>]?)$/s;
   const quantifier = /^(?:[?*+]|\{\d+(?:,\d*)?\})\??$/;
@@ -109,7 +111,7 @@ const RegexColorizer = (() => {
         return parseInt(t.slice(1), 16);
       }
       // One to three digit octal character code up to 377 (0xFF)
-      if (/^(?:[0-3][0-7]{0,2}|[4-7][0-7]?)$/.test(t)) {
+      if (new RegExp(`^(?:${octalRange})$`).test(t)) {
         return parseInt(t, 8);
       }
       // Shorthand class or incomplete token
@@ -473,7 +475,7 @@ const RegexColorizer = (() => {
             // Octal followed by literal, or escaped literal followed by literal
             } else {
               const {escapedNum, escapedLiteral, literal} =
-                /^\\(?<escapedNum>[0-3][0-7]{0,2}|[4-7][0-7]?|(?<escapedLiteral>[89]))(?<literal>\d*)/.exec(m).groups;
+                new RegExp(String.raw`^\\(?<escapedNum>${octalRange}|(?<escapedLiteral>[89]))(?<literal>\d*)`).exec(m).groups;
               if (escapedLiteral) {
                 // For \8 and \9 (escaped non-octal digits) when as many capturing groups aren't in
                 // the pattern, they match '8' and '9' (when not using flag u or v).
