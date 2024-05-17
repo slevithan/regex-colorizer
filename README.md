@@ -1,4 +1,4 @@
-﻿# Regex Colorizer 1.0.0-pre
+﻿# Regex Colorizer 1.0.0
 
 Regex Colorizer adds syntax highlighting to your regular expressions in blogs, docs, regex testers, and other tools. Supports the **JavaScript regex flavor** ([ES2022](https://github.com/slevithan/awesome-regex#javascript-regex-evolution)) with **web reality**. In other words, it highlights regexes as web browsers actually interpret them.
 

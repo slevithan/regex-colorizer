@@ -1,6 +1,6 @@
 {
   "name": "regex-colorizer",
-  "version": "1.0.0-pre",
+  "version": "1.0.0",
   "description": "Highlight regex syntax",
   "homepage": "https://slevithan.github.io/regex-colorizer/demo/",
   "main": "src/index.js",
@@ -19,6 +19,7 @@
   },
   "keywords": [
     "regex",
+    "regexp",
     "syntax-highlighting"
   ],
   "devDependencies": {
