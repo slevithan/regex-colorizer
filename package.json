@@ -1,0 +1,27 @@
+{
+  "name": "regex-colorizer",
+  "version": "1.0.0-pre",
+  "description": "Highlight regex syntax",
+  "homepage": "https://slevithan.github.io/regex-colorizer/demo/",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "esbuild src/index.js --bundle --minify --outfile=dist/regex-colorizer.min.js --global-name=RegexColorizer",
+    "pretest": "npm run build",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublish": "npm test"
+  },
+  "author": "Steven Levithan",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/slevithan/regex-colorizer.git"
+  },
+  "keywords": [
+    "regex",
+    "syntax-highlighting"
+  ],
+  "devDependencies": {
+    "esbuild": "^0.21.3"
+  }
+}
