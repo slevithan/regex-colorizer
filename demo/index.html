@@ -103,13 +103,13 @@ RegexColorizer.colorizeAll({
 
 // Optionally provide flags
 RegexColorizer.colorizeAll({
-  // Flags provided in CSS classes will override this
+  // Flags provided in data-flags attributes will override this
   flags: 'u',
 });
 
 // You can also just get the highlighting HTML for a specific pattern
 const pattern = '(?&lt;=\\d)';
-const html = RegexColorizer.colorizePattern(pattern, {
+someElement.innerHTML = RegexColorizer.colorizePattern(pattern, {
   flags: 'u',
 });</code></pre>
 
@@ -119,10 +119,9 @@ const html = RegexColorizer.colorizePattern(pattern, {
   &lt;code class="regex">(?&amp;lt;=\d)\p{L}\8&lt;/code>.
 
   And here's the same regex but with different rules from flag u:
-  &lt;code class="regex regex-flags-u">(?&amp;lt;=\d)\p{L}\8&lt;/code>.
+  &lt;code class="regex" data-flags="u">(?&amp;lt;=\d)\p{L}\8&lt;/code>.
 &lt;/p>
-&lt;!-- Can include any valid flags in the class.
-Ex: class="regex regex-flags-gimsuyd" --&gt;</code></pre>
+&lt;!-- Can include any valid flags. Ex: data-flags="gimsuyd" --&gt;</code></pre>
 
     <p>Output:</p>
     <div class="html-output-example">
@@ -131,7 +130,7 @@ Ex: class="regex regex-flags-gimsuyd" --&gt;</code></pre>
         <code class="regex">(?&lt;=\d)\p{L}\8</code>.
 
         And here's the same regex but with different rules from flag u:
-        <code class="regex regex-flags-u">(?&lt;=\d)\p{L}\8</code>.
+        <code class="regex" data-flags="u">(?&lt;=\d)\p{L}\8</code>.
       </p>
     </div>
 
@@ -179,17 +178,12 @@ Ex: class="regex regex-flags-gimsuyd" --&gt;</code></pre>
     }
 
     function setFlagsFor(id, flags) {
-      const el = document.getElementById(id);
-      const flagsClassPrefix = 'regex-flags-';
-      el.classList.forEach(cls => {
-        if (cls.startsWith(flagsClassPrefix)) {
-          el.classList.remove(cls);
-        }
+      document.getElementById(id).dataset.flags = flags;
+      RegexColorizer.colorizeAll({
+        selector: `#${id}`,
+        // Alternatively, if not using the `data-flags` attribute:
+        // flags,
       });
-      if (flags) {
-        el.classList.add(flagsClassPrefix + flags);
-      }
-      RegexColorizer.colorizeAll();
     }
   </script>
 

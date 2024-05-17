@@ -352,8 +352,8 @@ const RegexColorizer = (() => {
    * Returns HTML for displaying the given regex with syntax highlighting.
    * @param {string} pattern Regex pattern to be colorized.
    * @param {Object} [options]
-   * @param {string} [options.flags]
-   * @returns {string}
+   * @param {string} [options.flags] Any combination of valid flags.
+   * @returns {string} HTML with highlighting.
    */
   self.colorizePattern = (pattern, {
     flags = '',
@@ -683,8 +683,9 @@ const RegexColorizer = (() => {
   /**
    * Applies highlighting to all regex elements on the page, replacing their content with HTML.
    * @param {Object} [options]
-   * @param {string} [options.selector='.regex'] querySelectorAll value for elements to highlight.
-   * @param {string} [options.flags]
+   * @param {string} [options.selector='.regex'] `querySelectorAll` value: elements to highlight.
+   * @param {string} [options.flags] Any combination of valid flags. Overridden by `data-flags`
+   * attribute.
    */
   self.colorizeAll = ({
     selector = '.regex',
@@ -692,17 +693,9 @@ const RegexColorizer = (() => {
   } = {}) => {
     const els = document.querySelectorAll(selector);
     els.forEach(el => {
-      let overrideFlags;
-      const flagsClassPrefix = 'regex-flags-';
-      for (const cls of el.classList.values()) {
-        if (cls.startsWith(flagsClassPrefix)) {
-          overrideFlags = cls.slice(flagsClassPrefix.length);
-          break;
-        }
-      }
       el.classList.add(styleId);
       el.innerHTML = self.colorizePattern(el.textContent, {
-        flags: overrideFlags || flags,
+        flags: el.dataset.flags || flags,
       });
     });
   };

@@ -28,13 +28,13 @@ RegexColorizer.colorizeAll({
 
 // Optionally provide flags
 RegexColorizer.colorizeAll({
-  // Flags provided in CSS classes will override this
+  // Flags provided in data-flags attributes will override this
   flags: 'u',
 });
 
 // You can also just get the highlighting HTML for a specific pattern
 const pattern = '(?<=\\d)';
-const html = RegexColorizer.colorizePattern(pattern, {
+someElement.innerHTML = RegexColorizer.colorizePattern(pattern, {
   flags: 'u',
 });
 ```
@@ -47,10 +47,9 @@ In your HTML:
   <code class="regex">(?&lt;=\d)\p{L}\8</code>.
 
   And here's the same regex but with different rules from flag u:
-  <code class="regex regex-flags-u">(?&lt;=\d)\p{L}\8</code>.
+  <code class="regex" data-flags="u">(?&lt;=\d)\p{L}\8</code>.
 </p>
-<!-- Can include any valid flags in the class.
-Ex: class="regex regex-flags-gimsuyd" -->
+<!-- Can include any valid flags. Ex: data-flags="gimsuyd" -->
 ```
 
 ## Demo
