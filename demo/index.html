@@ -114,8 +114,7 @@ RegexColorizer.colorizeAll({
 });
 
 // You can also just get the highlighting HTML for a specific pattern
-const pattern = '(?&lt;=\\d)';
-someElement.innerHTML = RegexColorizer.colorizePattern(pattern, {
+element.innerHTML = RegexColorizer.colorizePattern('(?&lt;=\\d)', {
   flags: 'u',
 });</code></pre>
 
