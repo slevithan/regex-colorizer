@@ -35,12 +35,12 @@
     <pre class="regex">(["'])(?:\\?.)*?\1</pre>
 
     <h2>Try it</h2>
-    <p><textarea id="input" placeholder="Type a regex pattern" spellcheck="false" oninput="colorizeInput(); autoGrow(this)"></textarea></p>
+    <p><textarea placeholder="Type a regex pattern" spellcheck="false" oninput="showOutput(this.value || this.placeholder); autoGrow(this)"></textarea></p>
     <figure>
       <pre id="output" class="regex">Type a regex pattern</pre>
       <figcaption>
         <label>
-          <input id="flag-u" type="checkbox" onchange="colorizeInput()">
+          <input type="checkbox" onchange="setFlagsFor('output', this.checked ? 'u' : '')">
           Flag <code>u</code> <small>(<code>unicode</code>)</small>
         </label>
       </figcaption>
@@ -152,14 +152,12 @@ someElement.innerHTML = RegexColorizer.colorizePattern(pattern, {
   <script>
     RegexColorizer.colorizeAll();
 
-    function colorizeInput() {
-      const pattern = document.getElementById('input').value || 'Type a regex pattern';
-      const unicodeOn = document.getElementById('flag-u').checked;
-      const flags = unicodeOn ? 'u' : '';
-      const html = RegexColorizer.colorizePattern(pattern, {
-        flags,
+    function showOutput(pattern) {
+      document.getElementById('output').innerHTML = pattern;
+      RegexColorizer.colorizeAll({
+        selector: '#output',
       });
-      document.getElementById('output').innerHTML = html;
+      // Alternatively, could use `RegexColorizer.colorizePattern` and assign to `innerHTML`
     }
 
     function autoGrow(el) {
