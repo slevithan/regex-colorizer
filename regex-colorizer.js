@@ -94,7 +94,7 @@ const RegexColorizer = (() => {
 
   /**
    * Returns the character code for the provided regex token. Supports tokens used within character
-   * classes only, since that's all it's currently needed for.
+   * classes only.
    * @param {string} token Regex token.
    * @returns {number} Character code of the provided token, or NaN.
    */
@@ -585,6 +585,33 @@ const RegexColorizer = (() => {
             lastToken = {
               quantifiable: false,
             };
+          // '\u{...}'
+          } else if (m.startsWith('\\u{')) {
+            if (flagsObj.unicode) {
+              const charCode = getTokenCharCode(m);
+              output += charCode <= 0x10FFFF ?
+                to.metasequence(m) :
+                to.error(m, error.INDEX_OVERFLOW);
+              lastToken = {
+                quantifiable: true,
+              };
+            // Non-Unicode mode and '\u{...}' includes only decimal digits, so treat as an escaped
+            // literal 'u' followed by a quantifier
+            } else if (/^\\u{\d+}$/.test(m)) {
+              // If there's a following `?` it will be handled as the next token which technically
+              // isn't correct, but everything is still highlighted correctly apart from the gap in
+              // tokens that might be visible depending on styling
+              output += to.error('\\u', error.INCOMPLETE_TOKEN) + to.error(m.slice(2), error.UNQUANTIFIABLE);
+              lastToken = {
+                quantifiable: false,
+              };
+            // Non-Unicode mode and '\u{...}' includes hex digits A-F/a-f
+            } else {
+              output += to.error('\\u', error.INCOMPLETE_TOKEN) + m.slice(2);
+              lastToken = {
+                quantifiable: true,
+              };
+            }
           // Unquantifiable metasequence
           } else if ('bB'.includes(char1)) {
             output += to.metasequence(m);
