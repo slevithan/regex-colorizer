@@ -22,10 +22,10 @@
     </h1>
     <ul>
       <li><strong>Current version:</strong> 1.0.0-pre</li>
-      <li><strong>Size:</strong> 3.9 KB min/gzip (no dependencies)</li>
+      <li><strong>Size:</strong> 5 KB min/gzip, no dependencies</li>
       <li><strong>License:</strong> <a href="https://mit-license.org/">MIT</a></li>
     </ul>
-    <p>Regex Colorizer adds syntax highlighting to your regular expressions in blogs, docs, regex testers, and other tools. Supports the <strong>JavaScript regex flavor</strong> (<a href="https://github.com/slevithan/awesome-regex#javascript-regex-evolution">ES2022</a>) with <strong>web reality</strong>. In other words, it highlights regexes as web browsers actually interpret them. ES2024's flag <code>v</code> is not yet supported.</p>
+    <p>Regex Colorizer adds syntax highlighting to your regular expressions in blogs, docs, regex testers, and other tools. Supports the <strong>JavaScript regex flavor</strong> (<a href="https://github.com/slevithan/awesome-regex#javascript-regex-evolution">ES2022</a>) with <strong>web reality</strong>. In other words, it highlights regexes as web browsers actually interpret them.</p>
     <p>The API is simple. Just give the elements that contain your regexes (<code>pre</code>, <code>code</code>, or whatever) the class <code>regex</code>, and call <code>RegexColorizer.colorizeAll()</code>. See more usage examples below.</p>
 
     <h2>Examples</h2>
@@ -120,7 +120,7 @@ someElement.innerHTML = RegexColorizer.colorizePattern(pattern, {
 });</code></pre>
 
     <p>In your HTML:</p>
-    <pre><code class="language-xml">&lt;p>
+    <pre><code class="language-html">&lt;p>
   This regex is highlighted inline:
   &lt;code class="regex">(?&amp;lt;=\d)\p{L}\8&lt;/code>.
 
