@@ -2,8 +2,8 @@
 
 [<img align="left" src="https://github.com/slevithan/awesome-regex/raw/main/media/awesome-regex.svg" height="43">](https://github.com/slevithan/awesome-regex)
 
-&nbsp; <sub>Included in</sub><br>
-&nbsp; <sup>[Awesome Regex](https://github.com/slevithan/awesome-regex)</sup>
+<small><sub>Included in</sub></small><br>
+<sup>[Awesome Regex](https://github.com/slevithan/awesome-regex)</sup>
 
 Regex Colorizer adds syntax highlighting to your regular expressions in blogs, docs, regex testers, and other tools. Supports the **JavaScript regex flavor** ([ES2022](https://github.com/slevithan/awesome-regex#javascript-regex-evolution)) with **web reality**. In other words, it highlights regexes as web browsers actually interpret them.
 
