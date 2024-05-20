@@ -1,5 +1,8 @@
 ﻿# Regex Colorizer 1.0.0
 
+<sub><img src="https://github.com/slevithan/awesome-regex/raw/main/media/awesome-regex.svg" height="26"></sub>
+&nbsp;<sup>Included in [Awesome Regex](https://github.com/slevithan/awesome-regex)</sup>
+
 Regex Colorizer adds syntax highlighting to your regular expressions in blogs, docs, regex testers, and other tools. Supports the **JavaScript regex flavor** ([ES2022](https://github.com/slevithan/awesome-regex#javascript-regex-evolution)) with **web reality**. In other words, it highlights regexes as web browsers actually interpret them.
 
 The API is simple. Just give the elements that contain your regexes (`pre`, `code`, or whatever) the class `regex`, and call `RegexColorizer.colorizeAll()`. See more usage examples below.
