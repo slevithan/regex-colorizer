@@ -2,7 +2,7 @@
   "name": "regexcolorizer",
   "version": "1.0.0",
   "description": "Highlight regex syntax",
-  "homepage": "https://slevithan.github.io/regex-colorizer/demo/",
+  "homepage": "https://slevithan.github.io/regexcolorizer/demo/",
   "author": "Steven Levithan",
   "license": "MIT",
   "type": "module",
@@ -16,7 +16,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/slevithan/regex-colorizer.git"
+    "url": "git+https://github.com/slevithan/regexcolorizer.git"
   },
   "keywords": [
     "regex",
