@@ -1,15 +1,18 @@
 ﻿# Regex Colorizer 1.0.0
 
-[<img align="left" src="https://github.com/slevithan/awesome-regex/raw/main/media/awesome-regex.svg" height="45">](https://github.com/slevithan/awesome-regex) <sub>Included in</sub><br>
-<sup>[Awesome Regex](https://github.com/slevithan/awesome-regex)</sup>
-
-Regex Colorizer adds syntax highlighting to your regular expressions in blogs, docs, regex testers, and other tools. Supports the **JavaScript regex flavor** ([ES2022](https://github.com/slevithan/awesome-regex#javascript-regex-evolution)) with **web reality**. In other words, it highlights regexes as web browsers actually interpret them.
+Regex Colorizer is a lightweight library (5 KB min/gzip, no dependencies) for adding syntax highlighting to your regular expressions in blogs, docs, regex testers, and other tools. Supports the **JavaScript regex flavor** ([ES2022](https://github.com/slevithan/awesome-regex#javascript-regex-evolution)) with **web reality**. In other words, it highlights regexes as web browsers actually interpret them.
 
 The API is simple. Just give the elements that contain your regexes (`pre`, `code`, or whatever) the class `regex`, and call `RegexColorizer.colorizeAll()`. See more usage examples below.
 
 Errors are highlighted, along with some edge cases that can cause cross-browser grief. Hover over errors for a description of the problem.
 
-[5 KB min/gzip, no dependencies.]
+## Demo
+
+Try it out on the [**demo page**](https://slevithan.github.io/regex-colorizer/demo/), which also includes more details.
+
+## Install and use
+
+
 
 ## Themes
 
@@ -53,7 +56,3 @@ In your HTML:
 </p>
 <!-- Can include any valid flags. Ex: data-flags="gimsuyd" -->
 ```
-
-## Demo
-
-See the [demo page](https://slevithan.github.io/regex-colorizer/demo/) for more details.
