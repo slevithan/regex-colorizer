@@ -1,6 +1,6 @@
-﻿# Regex Colorizer 1.0.0
+﻿# Regex Colorizer
 
-Regex Colorizer is a lightweight library (5 KB min/gzip, no dependencies) for adding syntax highlighting to your regular expressions in blogs, docs, regex testers, and other tools. Supports the **JavaScript regex flavor** ([ES2022](https://github.com/slevithan/awesome-regex#javascript-regex-evolution)) with **web reality**. In other words, it highlights regexes as web browsers actually interpret them.
+Regex Colorizer is a lightweight library (5 KB min/gzip, no dependencies) for adding syntax highlighting to your regular expressions in blogs, docs, regex testers, and other tools. It supports the **JavaScript regex flavor** ([ES2022](https://github.com/slevithan/awesome-regex#javascript-regex-evolution)) with **web reality**. In other words, it highlights regexes as web browsers actually interpret them.
 
 The API is simple. Just give the elements that contain your regexes (`pre`, `code`, or whatever) the class `regex`, and call `colorizeAll()`. See more usage examples below.
 
@@ -23,7 +23,7 @@ import {colorizeAll, colorizePattern, loadStyles} from 'regexcolorizer';
 In browsers (using a global name):
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/regexcolorizer@1.0.0/dist/regexcolorizer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/regexcolorizer@1.0.1/dist/regexcolorizer.min.js"></script>
 <script>
   const {colorizeAll, colorizePattern, loadStyles} = RegexColorizer;
 </script>

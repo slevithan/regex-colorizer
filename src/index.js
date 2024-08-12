@@ -1,7 +1,8 @@
-/*! Regex Colorizer 1.0.0
- * (c) 2010-2024 Steven Levithan
- * MIT license
- */
+/*!
+Regex Colorizer
+(c) 2010-2024 Steven Levithan
+MIT license
+*/
 
 const unicodePropX = '[pP] { (?<property> (?: [A-Za-z_]+ = )? [A-Za-z_]+ ) }';
 const cuxTokenX = String.raw`c [A-Za-z] | u (?: [\dA-Fa-f]{4} | { [\dA-Fa-f]+ } ) | x [\dA-Fa-f]{2}`;
