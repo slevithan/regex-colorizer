@@ -2,7 +2,7 @@
 
 Regex Colorizer is a lightweight library (5 KB min/gzip, no dependencies) for adding syntax highlighting to your regular expressions in blogs, docs, regex testers, and other tools. Supports the **JavaScript regex flavor** ([ES2022](https://github.com/slevithan/awesome-regex#javascript-regex-evolution)) with **web reality**. In other words, it highlights regexes as web browsers actually interpret them.
 
-The API is simple. Just give the elements that contain your regexes (`pre`, `code`, or whatever) the class `regex`, and call `RegexColorizer.colorizeAll()`. See more usage examples below.
+The API is simple. Just give the elements that contain your regexes (`pre`, `code`, or whatever) the class `regex`, and call `colorizeAll()`. See more usage examples below.
 
 Errors are highlighted, along with some edge cases that can cause cross-browser grief. Hover over errors for a description of the problem.
 
@@ -31,30 +31,34 @@ In browsers (using a global name):
 
 ## Themes
 
-Several themes are available as stylesheets, but you don't need to add a stylesheet to your page to use the default theme. Just run `RegexColorizer.loadStyles()`.
+Several themes are available as stylesheets, but you don't need to add a stylesheet to your page to use the default theme. Just run `loadStyles()`.
 
 ## Usage
 
 ```js
+import {colorizeAll, colorizePattern, loadStyles} from 'regexcolorizer';
+// Or, if using the browser bundle:
+// const {colorizeAll, colorizePattern, loadStyles} = RegexColorizer;
+
 // Don't run this line if you provide your own stylesheet
-RegexColorizer.loadStyles();
+loadStyles();
 
-// Highlight all elements with class 'regex'
-RegexColorizer.colorizeAll();
+// Highlight all elements with class `regex`
+colorizeAll();
 
-// Or provide a querySelectorAll value for elements to highlight
-RegexColorizer.colorizeAll({
+// Or provide a `querySelectorAll` value for elements to highlight
+colorizeAll({
   selector: '.regex',
 });
 
 // Optionally provide flags
-RegexColorizer.colorizeAll({
-  // Flags provided in data-flags attributes will override this
+colorizeAll({
+  // Flags provided in `data-flags` attributes will override this
   flags: 'u',
 });
 
 // You can also just get the highlighting HTML for a specific pattern
-element.innerHTML = RegexColorizer.colorizePattern('(?<=\\d)', {
+element.innerHTML = colorizePattern('(?<=\\d)', {
   flags: 'u',
 });
 ```

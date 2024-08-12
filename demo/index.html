@@ -26,7 +26,7 @@
       <li><strong>License:</strong> <a href="https://mit-license.org/">MIT</a></li>
     </ul>
     <p>Regex Colorizer adds syntax highlighting to your regular expressions in blogs, docs, regex testers, and other tools. Supports the <strong>JavaScript regex flavor</strong> (<a href="https://github.com/slevithan/awesome-regex#javascript-regex-evolution">ES2022</a>) with <strong>web reality</strong>. In other words, it highlights regexes as web browsers actually interpret them.</p>
-    <p>The API is simple. Just give the elements that contain your regexes (<code>pre</code>, <code>code</code>, or whatever) the class <code>regex</code>, and call <code>RegexColorizer.colorizeAll()</code>. See more usage examples below.</p>
+    <p>The API is simple. Just give the elements that contain your regexes (<code>pre</code>, <code>code</code>, or whatever) the class <code>regex</code>, and call <code>colorizeAll()</code>. See more usage examples below.</p>
 
     <h2>Examples</h2>
     <h3>SSN, excluding invalid ranges</h3>
@@ -55,10 +55,10 @@
       <button id="regexbuddy-btn" onclick="setTheme('regexbuddy')">RegexBuddy</button>
     </p>
     <div class="info no-margin-collapse">
-      <p id="info-theme-default">You don't need to add a stylesheet to your page to use the default theme. Just run <code>RegexColorizer.loadStyles()</code>.</p>
+      <p id="info-theme-default">You don't need to add a stylesheet to your page to use the default theme. Just run <code>loadStyles()</code>.</p>
       <p id="info-theme-nobg" class="hidden">The No BG theme avoids background colors as part of highlighting.</p>
       <p id="info-theme-regexpal" class="hidden">In 2007, <a href="https://stevenlevithan.com/regexpal/">RegexPal</a> was the first web-based regex tester with regex syntax highlighting. Regex Colorizer started out by extracting RegexPal's highlighting code into a standalone library. This theme uses all black text, because RegexPal's implementation used highlighted text underneath a <code>textarea</code> with a transparent background. The RegexPal theme doesn't <em>uniquely</em> distinguish the following: escaped literal tokens, backreferences, and character class boundaries.</p>
-      <p id="info-theme-regexbuddy" class="hidden">OG <a href="https://www.regexbuddy.com/">RegexBuddy</a>'s highlighting styles. RegexBuddy inspired RegexPal and many others. Currently, the RegexBuddy theme doesn't <em>uniquely</em> distinguish the following: escaped literal tokens, backreferences, character class boundaries, and range-hyphens.</p>
+      <p id="info-theme-regexbuddy" class="hidden">OG <a href="https://www.regexbuddy.com/">RegexBuddy</a>'s highlighting styles. RegexBuddy inspired RegexPal and many others. The RegexBuddy theme is based on older versions of the app which didn't <em>uniquely</em> distinguish the following: escaped literal tokens, backreferences, character class boundaries, and range-hyphens.</p>
     </div>
 
     <h2>More examples</h2>
@@ -96,25 +96,29 @@
 
     <h2>Usage</h2>
     <p>Here's how to highlight all your regexes like you can see running on this page:</p>
-    <pre><code class="language-javascript">// Don't run this line if you provide your own stylesheet
-RegexColorizer.loadStyles();
+    <pre><code class="language-javascript">import {colorizeAll, colorizePattern, loadStyles} from 'regexcolorizer';
+// Or, if using the browser bundle:
+// const {colorizeAll, colorizePattern, loadStyles} = RegexColorizer;
 
-// Highlight all elements with class 'regex'
-RegexColorizer.colorizeAll();
+// Don't run this line if you provide your own stylesheet
+loadStyles();
 
-// Or provide a querySelectorAll value for elements to highlight
-RegexColorizer.colorizeAll({
+// Highlight all elements with class `regex`
+colorizeAll();
+
+// Or provide a `querySelectorAll` value for elements to highlight
+colorizeAll({
   selector: '.regex',
 });
 
 // Optionally provide flags
-RegexColorizer.colorizeAll({
-  // Flags provided in data-flags attributes will override this
+colorizeAll({
+  // Flags provided in `data-flags` attributes will override this
   flags: 'u',
 });
 
 // You can also just get the highlighting HTML for a specific pattern
-element.innerHTML = RegexColorizer.colorizePattern('(?&lt;=\\d)', {
+element.innerHTML = colorizePattern('(?&lt;=\\d)', {
   flags: 'u',
 });</code></pre>
 
