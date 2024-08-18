@@ -12,6 +12,9 @@ Try it out on the [**demo page**](https://slevithan.github.io/regex-colorizer/de
 
 ## Install and use
 
+> [!IMPORTANT]
+> The latest versions are not yet available on npm or CDNs due to an ongoing issue. Until it's resolved, Regex Colorizer needs to be downloaded from GitHub.
+
 ```sh
 npm install regex-colorizer
 ```
