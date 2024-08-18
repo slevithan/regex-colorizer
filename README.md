@@ -8,22 +8,22 @@ Errors are highlighted, along with some edge cases that can cause cross-browser 
 
 ## Demo
 
-Try it out on the [**demo page**](https://slevithan.github.io/regexcolorizer/demo/), which also includes more details.
+Try it out on the [**demo page**](https://slevithan.github.io/regex-colorizer/demo/), which also includes more details.
 
 ## Install and use
 
 ```sh
-npm install regexcolorizer
+npm install regex-colorizer
 ```
 
 ```js
-import {colorizeAll, colorizePattern, loadStyles} from 'regexcolorizer';
+import {colorizeAll, colorizePattern, loadStyles} from 'regex-colorizer';
 ```
 
 In browsers (using a global name):
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/regexcolorizer@1.0.1/dist/regexcolorizer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/regex-colorizer@1.0.1/dist/regex-colorizer.min.js"></script>
 <script>
   const {colorizeAll, colorizePattern, loadStyles} = RegexColorizer;
 </script>
@@ -36,7 +36,7 @@ Several themes are available as stylesheets, but you don't need to add a stylesh
 ## Usage
 
 ```js
-import {colorizeAll, colorizePattern, loadStyles} from 'regexcolorizer';
+import {colorizeAll, colorizePattern, loadStyles} from 'regex-colorizer';
 // Or, if using the browser bundle:
 // const {colorizeAll, colorizePattern, loadStyles} = RegexColorizer;
 
