@@ -13,8 +13,9 @@ Try it out on the [**demo page**](https://slevithan.github.io/regex-colorizer/de
 ## Install and use
 
 > [!IMPORTANT]
-> The latest versions are not yet available on npm or CDNs due to an ongoing issue. Until it's resolved, Regex Colorizer needs to be downloaded from GitHub.
+> The latest versions are not yet available on npm or CDNs due to an ongoing issue. For now, Regex Colorizer needs to be downloaded from GitHub.
 
+<!--
 ```sh
 npm install regex-colorizer
 ```
@@ -22,11 +23,10 @@ npm install regex-colorizer
 ```js
 import {colorizeAll, colorizePattern, loadStyles} from 'regex-colorizer';
 ```
-
-In browsers (using a global name):
+--->
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/regex-colorizer@1.0.1/dist/regex-colorizer.min.js"></script>
+<script src="./dist/regex-colorizer.min.js"></script>
 <script>
   const {colorizeAll, colorizePattern, loadStyles} = RegexColorizer;
 </script>
@@ -39,9 +39,7 @@ Several themes are available as stylesheets, but you don't need to add a stylesh
 ## Usage
 
 ```js
-import {colorizeAll, colorizePattern, loadStyles} from 'regex-colorizer';
-// Or, if using the browser bundle:
-// const {colorizeAll, colorizePattern, loadStyles} = RegexColorizer;
+const {colorizeAll, colorizePattern, loadStyles} = RegexColorizer;
 
 // Don't run this line if you provide your own stylesheet
 loadStyles();
