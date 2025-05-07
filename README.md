@@ -3,7 +3,7 @@
 [![npm version][npm-version-src]][npm-version-href]
 [![bundle][bundle-src]][bundle-href]
 
-Regex Colorizer is a lightweight library (3.8 kB, with no dependencies) for adding syntax highlighting to your regular expressions in blogs, docs, regex testers, and other tools. It supports the **JavaScript regex flavor** ([ES2022](https://github.com/slevithan/awesome-regex#javascript-regex-evolution)) with **web reality**. In other words, it highlights regexes as web browsers actually interpret them.
+Regex Colorizer is a lightweight library (3.8 kB, with no dependencies) for adding syntax highlighting to your regular expressions in blogs, docs, regex testers, and other tools. It supports the **JavaScript regex flavor** (ES2023) with **web reality**. In other words, it highlights regexes as web browsers actually interpret them.
 
 The API is simple. Just give the elements that contain your regexes (`pre`, `code`, or whatever) the class `regex`, and call `colorizeAll()`. See more usage examples below.
 
@@ -81,7 +81,7 @@ Several themes are available as stylesheets, but you don't need to add a stylesh
 
 ## 🏷️ About
 
-Regex Colorizer was created by [Steven Levithan](https://github.com/slevithan). It started in 2007 as part of [RegexPal](https://stevenlevithan.com/regexpal/), the first web-based regex tester with regex syntax highlighting. It was first extracted into a standalone library in 2010.
+Regex Colorizer was created by [Steven Levithan](https://github.com/slevithan). It started in 2007 as part of [RegexPal](https://stevenlevithan.com/regexpal/), the first web-based regex tester with regex syntax highlighting. It was extracted into a standalone library in 2010.
 
 If you want to support this project, I'd love your help by contributing improvements, sharing it with others, or [sponsoring](https://github.com/sponsors/slevithan) ongoing development.
 
