@@ -68,8 +68,8 @@ In your HTML:
 
   And here's the same regex but with different rules from flag u:
   <code class="regex" data-flags="u">(?&lt;=\d)\p{L}\8</code>.
+  <!-- Can include any valid flags. Ex: data-flags="gimsuyd" -->
 </p>
-<!-- Can include any valid flags. Ex: data-flags="gimsuyd" -->
 ```
 
 ## 👗 Themes

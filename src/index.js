@@ -1,7 +1,7 @@
 /*!
 Regex Colorizer
-(c) 2010-2024 Steven Levithan
-MIT license
+(c) 2010-2025 Steven Levithan
+MIT License
 */
 
 const unicodePropX = '[pP] { (?<property> (?: [A-Za-z_]+ = )? [A-Za-z_]+ ) }';
