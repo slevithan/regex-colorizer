@@ -1,45 +1,40 @@
-﻿# Regex Colorizer
+﻿# Regex Colorizer 🎨
 
-Regex Colorizer is a lightweight library (5 KB min/gzip, no dependencies) for adding syntax highlighting to your regular expressions in blogs, docs, regex testers, and other tools. It supports the **JavaScript regex flavor** ([ES2022](https://github.com/slevithan/awesome-regex#javascript-regex-evolution)) with **web reality**. In other words, it highlights regexes as web browsers actually interpret them.
+Regex Colorizer is a lightweight library (5 kB min/gzip, with no dependencies) for adding syntax highlighting to your regular expressions in blogs, docs, regex testers, and other tools. It supports the **JavaScript regex flavor** ([ES2022](https://github.com/slevithan/awesome-regex#javascript-regex-evolution)) with **web reality**. In other words, it highlights regexes as web browsers actually interpret them.
 
 The API is simple. Just give the elements that contain your regexes (`pre`, `code`, or whatever) the class `regex`, and call `colorizeAll()`. See more usage examples below.
 
 Errors are highlighted, along with some edge cases that can cause cross-browser grief. Hover over errors for a description of the problem.
 
-## Demo
+## 🧪 Demo
 
 Try it out on the [**demo page**](https://slevithan.github.io/regex-colorizer/demo/), which also includes more details.
 
-## Install and use
+## 🕹️ Install and use
 
-> [!IMPORTANT]
-> The latest versions are not yet available on npm or CDNs due to an ongoing issue. For now, Regex Colorizer needs to be downloaded from GitHub.
-
-<!--
 ```sh
 npm install regex-colorizer
 ```
 
 ```js
-import {colorizeAll, colorizePattern, loadStyles} from 'regex-colorizer';
+import {colorizeAll, loadStyles} from 'regex-colorizer';
 ```
---->
+
+<details>
+  <summary>Using a CDN and global name</summary>
 
 ```html
-<script src="./dist/regex-colorizer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/regex-colorizer/dist/regex-colorizer.min.js"></script>
 <script>
-  const {colorizeAll, colorizePattern, loadStyles} = RegexColorizer;
+  const {colorizeAll, loadStyles} = RegexColorizer;
 </script>
 ```
+</details>
 
-## Themes
-
-Several themes are available as stylesheets, but you don't need to add a stylesheet to your page to use the default theme. Just run `loadStyles()`.
-
-## Usage
+## 🪧 Examples
 
 ```js
-const {colorizeAll, colorizePattern, loadStyles} = RegexColorizer;
+import {colorizeAll, colorizePattern, loadStyles} from 'regex-colorizer';
 
 // Don't run this line if you provide your own stylesheet
 loadStyles();
@@ -76,3 +71,15 @@ In your HTML:
 </p>
 <!-- Can include any valid flags. Ex: data-flags="gimsuyd" -->
 ```
+
+## 👗 Themes
+
+Several themes are available as stylesheets, but you don't need to add a stylesheet to your page to use the default theme. Just run `loadStyles()`.
+
+## 🏷️ About
+
+Regex Colorizer was created by [Steven Levithan](https://github.com/slevithan). It started in 2007 as part of [RegexPal](https://stevenlevithan.com/regexpal/), the first web-based regex tester with regex syntax highlighting. It was first extracted into a standalone library in 2010.
+
+If you want to support this project, I'd love your help by contributing improvements, sharing it with others, or [sponsoring](https://github.com/sponsors/slevithan) ongoing development.
+
+© 2007–present. MIT License.
