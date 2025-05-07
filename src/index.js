@@ -776,4 +776,8 @@ function loadStyles() {
   document.querySelector('head').appendChild(ss);
 }
 
-export {colorizeAll, colorizePattern, loadStyles};
+export {
+  colorizeAll,
+  colorizePattern,
+  loadStyles,
+};

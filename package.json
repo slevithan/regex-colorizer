@@ -1,6 +1,6 @@
 {
   "name": "regex-colorizer",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Highlight regex syntax",
   "homepage": "https://slevithan.github.io/regex-colorizer/demo/",
   "author": "Steven Levithan",
