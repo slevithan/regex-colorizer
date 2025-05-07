@@ -1,5 +1,8 @@
 ﻿# Regex Colorizer 🎨
 
+[![npm version][npm-version-src]][npm-version-href]
+[![bundle][bundle-src]][bundle-href]
+
 Regex Colorizer is a lightweight library (5 kB min/gzip, with no dependencies) for adding syntax highlighting to your regular expressions in blogs, docs, regex testers, and other tools. It supports the **JavaScript regex flavor** ([ES2022](https://github.com/slevithan/awesome-regex#javascript-regex-evolution)) with **web reality**. In other words, it highlights regexes as web browsers actually interpret them.
 
 The API is simple. Just give the elements that contain your regexes (`pre`, `code`, or whatever) the class `regex`, and call `colorizeAll()`. See more usage examples below.
@@ -83,3 +86,10 @@ Regex Colorizer was created by [Steven Levithan](https://github.com/slevithan). 
 If you want to support this project, I'd love your help by contributing improvements, sharing it with others, or [sponsoring](https://github.com/sponsors/slevithan) ongoing development.
 
 © 2007–present. MIT License.
+
+<!-- Badges -->
+
+[npm-version-src]: https://img.shields.io/npm/v/regex-colorizer?color=78C372
+[npm-version-href]: https://npmjs.com/package/regex-colorizer
+[bundle-src]: https://img.shields.io/bundlejs/size/regex-colorizer?color=78C372&label=minzip
+[bundle-href]: https://bundlejs.com/?q=regex-colorizer&treeshake=[*]
