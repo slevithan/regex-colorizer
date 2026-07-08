@@ -22,14 +22,14 @@ const charClassToken = new RegExp(String.raw`
 | -
 `.replace(/\s+/g, ''), 'gs');
 const charClassParts = /^(?<opening>\[\^?)(?<content>(?:[^\\\]]+|\\.?)*)(?<closing>]?)$/s;
-const quantifier = /^(?:[?*+]|\{\d+(?:,\d*)?\})\??$/;
+const quantifier = /^(?:[?*+]|\{\d+(?:,\d*)?})\??$/;
 
-const type = {
-  NONE: 0,
-  RANGE_HYPHEN: 1,
-  SHORT_CLASS: 2,
-  ALTERNATOR: 3,
-};
+enum type {
+  NONE = 0,
+  RANGE_HYPHEN = 1,
+  SHORT_CLASS = 2,
+  ALTERNATOR = 3,
+}
 
 const error = {
   DUPLICATE_CAPTURE_NAME: 'Duplicate capture name',
@@ -53,27 +53,28 @@ const styleId = `rc-${(+new Date).toString(36).slice(-5)}`;
 // HTML generation functions for regex syntax parts
 const to = {
   // Depth is 0-5
-  alternator: (s, depth) => `<b${depth ? ` class="g${depth}"` : ''}>${s}</b>`,
-  backref: s => `<b class="bref">${s}</b>`,
-  charClass: s => `<i>${s}</i>`,
-  charClassBoundary: s => `<span>${s}</span>`,
-  error: (s, msg) => `<b class="err" title="${msg}">${s}</b>`,
-  escapedLiteral: s => `<span>${s}</span>`,
+  alternator: (s: string, depth: number) => `<b${depth ? ` class="g${depth}"` : ''}>${s}</b>`,
+  backref: (s: string) => `<b class="bref">${s}</b>`,
+  charClass: (s: string) => `<i>${s}</i>`,
+  charClassBoundary: (s: string) => `<span>${s}</span>`,
+  error: (s: string, msg: string) => `<b class="err" title="${msg}">${s}</b>`,
+  escapedLiteral: (s: string) => `<span>${s}</span>`,
   // Depth is 1-5
-  group: (s, depth) => `<b class="g${depth}">${s}</b>`,
-  metasequence: s => `<b>${s}</b>`,
+  group: (s: string, depth: number) => `<b class="g${depth}">${s}</b>`,
+  metasequence: (s: string) => `<b>${s}</b>`,
   // Depth is 0-5
-  quantifier: (s, depth) => `<b${depth ? ` class="g${depth}"` : ''}>${s}</b>`,
-  range: s => `<u>${s}</u>`,
+  quantifier: (s: string, depth: number) => `<b${depth ? ` class="g${depth}"` : ''}>${s}</b>`,
+  range: (s: string) => `<u>${s}</u>`,
 };
-to.group.openingTagLength = '<b class="gN">'.length;
+
+const openingTagLength = '<b class="gN">'.length;
 
 /**
  * Converts special characters to HTML entities.
  * @param {string} str String with characters to expand.
  * @returns {string} String with characters expanded.
  */
-function expandEntities(str) {
+function expandEntities(str: string): string {
   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;');
 }
 
@@ -82,7 +83,7 @@ function expandEntities(str) {
  * @param {string} str String with entities to collapse.
  * @returns {string} String with entities collapsed.
  */
-function collapseEntities(str) {
+function collapseEntities(str: string): string {
   return str.replace(/&amp;/g, '&').replace(/&lt;/g, '<');
 }
 
@@ -92,7 +93,7 @@ function collapseEntities(str) {
  * @param {string} token Regex token.
  * @returns {number} Character code of the provided token, or NaN.
  */
-function getTokenCharCode(token) {
+function getTokenCharCode(token: string): number {
   // Escape sequence
   if (token.length > 1 && token.charAt(0) === '\\') {
     const t = token.slice(1);
@@ -136,6 +137,14 @@ function getTokenCharCode(token) {
   return NaN;
 }
 
+type LastTokenType = {
+  rangeable?: boolean,
+  type?: type,
+  charCode?: number,
+  quantifiable?: boolean,
+  groupStyleDepth?: number
+}
+
 /**
  * Returns HTML for displaying the given character class with syntax highlighting.
  * Character classes have their own syntax rules which are different (sometimes subtly) from
@@ -144,9 +153,9 @@ function getTokenCharCode(token) {
  * @param {Object} flagsObj Whether each flag is enabled.
  * @returns {string}
  */
-function parseCharClass(value, flagsObj) {
+function parseCharClass(value: string, flagsObj: { [x: string]: boolean; unicode?: any; }): string {
   let output = '';
-  let lastToken = {
+  let lastToken: LastTokenType = {
     rangeable: false,
     type: type.NONE,
   };
@@ -308,8 +317,11 @@ function parseCharClass(value, flagsObj) {
  * @param {string} pattern Regex pattern to be searched.
  * @returns {Object}
  */
-function getPatternDetails(pattern) {
-  const captureNames = new Set();
+function getPatternDetails(pattern: string): {
+  captureNames: Set<string>;
+  totalCaptures: number;
+} {
+  const captureNames: Set<string> = new Set();
   let totalCaptures = 0;
   const matches = pattern.matchAll(regexToken);
   for (const match of matches) {
@@ -333,7 +345,9 @@ function getPatternDetails(pattern) {
  * @param {string} flags Regex flags.
  * @returns {Object}
  */
-function getFlagsObj(flags) {
+function getFlagsObj(flags: string): {
+  [p: string]: boolean, unicode?: any
+} {
   const flagNames = {
     d: 'hasIndices',
     g: 'global',
@@ -344,7 +358,7 @@ function getFlagsObj(flags) {
     v: 'unicodeSets',
     y: 'sticky',
   };
-  const flagsObj = Object.fromEntries(
+  const flagsObj: {[p: string]: boolean, unicode?: any} = Object.fromEntries(
     Object.values(flagNames).map(value => [value, false])
   );
   const flagsSet = new Set();
@@ -371,9 +385,11 @@ function getFlagsObj(flags) {
  * @param {string} [options.flags] Any combination of valid flags.
  * @returns {string} HTML with highlighting.
  */
-function colorizePattern (pattern, {
+function colorizePattern (pattern: string, {
   flags = '',
-} = {}) {
+}: {
+  flags?: string;
+} = {}): string {
   // Validate flags and use for regex syntax changes
   const flagsObj = getFlagsObj(flags);
   const {
@@ -386,7 +402,7 @@ function colorizePattern (pattern, {
   const openGroups = [];
   let capturingGroupCount = 0;
   let groupStyleDepth = 0;
-  let lastToken = {
+  let lastToken: LastTokenType = {
     quantifiable: false,
     type: type.NONE,
   };
@@ -427,7 +443,7 @@ function colorizePattern (pattern, {
         openGroups.push({
           valid: true,
           opening: expandEntities(m),
-          index: output.length + to.group.openingTagLength,
+          index: output.length + openingTagLength,
         });
         output += to.group(expandEntities(m), groupStyleDepth);
       }
@@ -733,8 +749,11 @@ function colorizePattern (pattern, {
 function colorizeAll({
   selector = '.regex',
   flags = '',
+}: {
+  selector?: string;
+  flags?: string;
 } = {}) {
-  const els = document.querySelectorAll(selector);
+  const els = document.querySelectorAll<HTMLElement>(selector);
   els.forEach(el => {
     el.classList.add(styleId);
     el.innerHTML = colorizePattern(el.textContent, {

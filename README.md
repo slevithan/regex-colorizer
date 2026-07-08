@@ -1,5 +1,7 @@
 ﻿# Regex Colorizer 🎨
 
+TypeScript port of [https://github.com/slevithan/regex-colorizer](https://github.com/slevithan/regex-colorizer)
+
 [![npm version][npm-version-src]][npm-version-href]
 [![bundle][bundle-src]][bundle-href]
 

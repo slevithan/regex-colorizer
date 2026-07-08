@@ -5,3 +5,6 @@ node_modules
 # Folder view configuration/cache files
 .DS_Store
 desktop.ini
+
+# JetBrains IDEs
+.idea
