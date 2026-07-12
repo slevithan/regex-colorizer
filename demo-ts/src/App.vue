@@ -1,0 +1,270 @@
+<template>
+  <main id="content">
+    <h1>Regex Colorizer</h1>
+
+    <p>
+     <textarea
+       v-model="pattern"
+       spellcheck="false"
+       placeholder="Type a regex pattern"
+     />
+    </p>
+
+    <figure>
+      <pre id="output" class="regex" :data-flags="flags" v-html="outputHtml" />
+      <figcaption>
+        <label>
+          <input v-model="useUnicode" type="checkbox" />
+          Flag <code>u</code>
+        </label>
+      </figcaption>
+    </figure>
+
+    <h2>Themes</h2>
+    <p>Several themes are available as stylesheets. Select an option to change the highlighting styles for all regexes on this page.</p>
+    <p>
+      <button id="default-btn" onclick="setTheme('default')" disabled>Default</button>
+      <button id="nobg-btn" onclick="setTheme('nobg')">No BG</button>
+      <button id="regexpal-btn" onclick="setTheme('regexpal')">RegexPal</button>
+      <button id="regexbuddy-btn" onclick="setTheme('regexbuddy')">RegexBuddy</button>
+    </p>
+    <div class="info no-margin-collapse">
+      <p id="info-theme-default">You don't need to add a stylesheet to your page to use the default theme. Just run <code>loadStyles()</code>.</p>
+      <p id="info-theme-nobg" class="hidden">The No BG theme avoids background colors as part of highlighting.</p>
+      <p id="info-theme-regexpal" class="hidden">In 2007, <a href="https://stevenlevithan.com/regexpal/">RegexPal</a> was the first web-based regex tester with regex syntax highlighting. Regex Colorizer started out by extracting RegexPal's highlighting code into a standalone library. This theme uses all black text, because RegexPal's implementation used highlighted text underneath a <code>textarea</code> with a transparent background. The RegexPal theme doesn't <em>uniquely</em> distinguish the following: escaped literal tokens, backreferences, and character class boundaries.</p>
+      <p id="info-theme-regexbuddy" class="hidden">OG <a href="https://www.regexbuddy.com/">RegexBuddy</a>'s highlighting styles. RegexBuddy inspired RegexPal and many others. The RegexBuddy theme is based on older versions of the app which didn't <em>uniquely</em> distinguish the following: escaped literal tokens, backreferences, character class boundaries, and range-hyphens.</p>
+    </div>
+
+    <h2>More examples</h2>
+    <h3>Regex with errors</h3>
+    <p>Errors are highlighted in red, along with some edge cases that can cause cross-browser grief. Hover over errors for a description of the problem.</p>
+    <pre class="regex">Oh h\i+?? x*+ |? a{1,2}b{2,1} ||(?:a|b)* (?&lt;=(?&lt;name>x))* (?>n)
+((((?:((a))b.c)d|x(y){65536,}))))
+[^1-59-6\b-\cX.a-\w!---] \xFF \x \uFF\uFFFF\z\v\1\\\</pre>
+    <h3>Octals and backreferences</h3>
+    <p>Regex syntax is complex, so Regex Colorizer's highlighting is contextually aware of things that happen forward and backward in the regex. Here's an example of contextually-aware highlighting of regex syntax:</p>
+    <figure>
+      <pre id="octalsRegex" class="regex">\+ Escapes are backreferences if num &lt;= capturing groups
+\1 \8 \9 \10 \k&lt;1> \k&lt;name>
+\+ Octals: leading 0 extends length
+\11 \100 \1234 \01234 \00123 \0 \00 \00000 \377 \400
+\+ Non-octal digits
+\18 \80 \90
+\+ Leading 0 in character class doesn't extend length
+[ \1234 is the same but not \0123; no backrefs \1 ]
+\+ Capturing groups can appear after their backrefs
+(1)(2)(?&lt;name>3)(4)(5)(6)(7)(8)(9)(10)</pre>
+      <figcaption>
+        <label>
+          <input type="checkbox" onchange="setFlagsFor('octalsRegex', this.checked ? 'u' : '')">
+          Flag <code>u</code> <small>(<code>unicode</code>)</small>
+        </label>
+      </figcaption>
+    </figure>
+
+    <h2>Themes</h2>
+    <p>Several themes are available as stylesheets. Select an option to change the highlighting styles for all regexes on this page.</p>
+    <p>
+      <button id="default-btn" onclick="setTheme('default')" disabled>Default</button>
+      <button id="nobg-btn" onclick="setTheme('nobg')">No BG</button>
+      <button id="regexpal-btn" onclick="setTheme('regexpal')">RegexPal</button>
+      <button id="regexbuddy-btn" onclick="setTheme('regexbuddy')">RegexBuddy</button>
+    </p>
+    <div class="info no-margin-collapse">
+      <p id="info-theme-default">You don't need to add a stylesheet to your page to use the default theme. Just run <code>loadStyles()</code>.</p>
+      <p id="info-theme-nobg" class="hidden">The No BG theme avoids background colors as part of highlighting.</p>
+      <p id="info-theme-regexpal" class="hidden">In 2007, <a href="https://stevenlevithan.com/regexpal/">RegexPal</a> was the first web-based regex tester with regex syntax highlighting. Regex Colorizer started out by extracting RegexPal's highlighting code into a standalone library. This theme uses all black text, because RegexPal's implementation used highlighted text underneath a <code>textarea</code> with a transparent background. The RegexPal theme doesn't <em>uniquely</em> distinguish the following: escaped literal tokens, backreferences, and character class boundaries.</p>
+      <p id="info-theme-regexbuddy" class="hidden">OG <a href="https://www.regexbuddy.com/">RegexBuddy</a>'s highlighting styles. RegexBuddy inspired RegexPal and many others. The RegexBuddy theme is based on older versions of the app which didn't <em>uniquely</em> distinguish the following: escaped literal tokens, backreferences, character class boundaries, and range-hyphens.</p>
+    </div>
+
+
+    <h2>More examples</h2>
+    <h3>Regex with errors</h3>
+    <p>Errors are highlighted in red, along with some edge cases that can cause cross-browser grief. Hover over errors for a description of the problem.</p>
+    <pre class="regex">Oh h\i+?? x*+ |? a{1,2}b{2,1} ||(?:a|b)* (?&lt;=(?&lt;name>x))* (?>n)
+((((?:((a))b.c)d|x(y){65536,}))))
+[^1-59-6\b-\cX.a-\w!---] \xFF \x \uFF\uFFFF\z\v\1\\\</pre>
+    <h3>Octals and backreferences</h3>
+    <p>Regex syntax is complex, so Regex Colorizer's highlighting is contextually aware of things that happen forward and backward in the regex. Here's an example of contextually-aware highlighting of regex syntax:</p>
+    <figure>
+      <pre id="octalsRegex" class="regex">\+ Escapes are backreferences if num &lt;= capturing groups
+\1 \8 \9 \10 \k&lt;1> \k&lt;name>
+\+ Octals: leading 0 extends length
+\11 \100 \1234 \01234 \00123 \0 \00 \00000 \377 \400
+\+ Non-octal digits
+\18 \80 \90
+\+ Leading 0 in character class doesn't extend length
+[ \1234 is the same but not \0123; no backrefs \1 ]
+\+ Capturing groups can appear after their backrefs
+(1)(2)(?&lt;name>3)(4)(5)(6)(7)(8)(9)(10)</pre>
+      <figcaption>
+        <label>
+          <input type="checkbox" onchange="setFlagsFor('octalsRegex', this.checked ? 'u' : '')">
+          Flag <code>u</code> <small>(<code>unicode</code>)</small>
+        </label>
+      </figcaption>
+    </figure>
+
+    <p>Some other examples of contextually-aware highlighting:</p>
+    <ul class="no-margin-collapse">
+      <li>
+        <strong>Named backreferences:</strong>
+        <code>\k&lt;name></code>
+        is only a named backreference if a named capture (with any name)
+        appears in the regex, even if after or enclosing the backreference
+        (so <code class="regex">\k&lt;n>(?&lt;n>a)</code> and
+        <code class="regex">(?&lt;n>a\k&lt;n>)</code> are valid;
+        the backreferences match empty strings). If there aren't any
+        named captures in the pattern, it's an escaped literal
+        <code class="regex">\k&lt;name></code> and matches the string
+        <code>'k&lt;name>'</code>. When named backreference behavior is triggered,
+        <code>\k</code> is an error if it's not a complete token
+        (ex: <code class="regex">(?&lt;n>)\k</code>), if the name is invalid
+        (ex: <code class="regex">(?&lt;n>)\k&lt;1></code>), or if there's no
+        corresponding named capturing group anywhere in the regex
+        (ex: <code class="regex">(?&lt;n>)\k&lt;m></code>).
+        Flags <code>u</code> and <code>v</code> enforce named
+        backreference mode handling in all cases.
+        And of course, named backreference syntax doesn't apply within
+        character classes (<code class="regex">[\k&lt;n>]</code>).
+      </li>
+      <li>
+        <strong>Hypens in character classes:</strong>
+        Hyphens only create ranges when preceded and followed by
+        rangeable tokens in the correct order that aren't themselves
+        part of ranges. Hyphens are literal <code>-</code> characters in
+        other cases. Compare <code class="regex">[----]</code>
+        (one range-hyphen), <code class="regex">[-----]</code>
+        (still one), and <code class="regex">[------]</code>
+        (two). Also handles errors (ex:
+        <code class="regex">[z-a]</code> and
+        <code class="regex">[\w-z]</code>, but <code class="regex">[\w-]</code>)
+        and metasequences or escaped literals that are used in valid
+        ranges (ex: <code class="regex">[a-\z]</code> and
+        <code class="regex">[\b-\cZ]</code>, but
+        <code class="regex">[\cZ-\b]</code>). Note: Within a character
+        class, <code>\b</code> matches a backspace control character
+        rather than a word boundary. Flag <code>v</code> changes the
+        rules to make any unescaped, non-range hyphens in character
+        classes become errors, and enables <code>--</code> as the set
+        substraction operator.
+      </li>
+    </ul>
+
+    <h2>Usage</h2>
+    <p>Here's how to highlight all your regexes like you can see running on this page:</p>
+
+    <pre><code class="language-javascript">import {colorizeAll, colorizePattern, loadStyles} from 'regex-colorizer';
+
+// Don't run this line if you provide your own stylesheet
+loadStyles();
+
+// Highlight all elements with class `regex`
+colorizeAll();
+
+// Or provide a `querySelectorAll` value for elements to highlight
+colorizeAll({
+  selector: '.regex',
+});
+
+// Optionally provide flags
+colorizeAll({
+  // Flags provided in `data-flags` attributes will override this
+  flags: 'u',
+});
+
+// You can also just get the highlighting HTML for a specific pattern
+element.innerHTML = colorizePattern('(?&lt;=\\d)', {
+  flags: 'u',
+});</code></pre>
+
+    <p>In your HTML:</p>
+    <pre><code class="language-html">&lt;p>
+  This regex is highlighted inline:
+  &lt;code class="regex">(?&amp;lt;=\d)\p{L}\8&lt;/code>.
+
+  And here's the same regex but with different rules from flag u:
+  &lt;code class="regex" data-flags="u">(?&amp;lt;=\d)\p{L}\8&lt;/code>.
+  &lt;!-- Can include any valid flags. Ex: data-flags="gimsuyd" --&gt;
+&lt;/p></code></pre>
+
+    <p>Output:</p>
+    <div class="html-output-example">
+      <p>
+        This regex is highlighted inline:
+        <code class="regex">(?&lt;=\d)\p{L}\8</code>.
+
+        And here's the same regex but with different rules from flag u:
+        <code class="regex" data-flags="u">(?&lt;=\d)\p{L}\8</code>.
+      </p>
+    </div>
+
+    <footer>
+      <p>
+        &copy; 2007&ndash;2026 Steven Levithan |
+        <a href="https://github.com/slevithan/regex-colorizer">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/c/c2/GitHub_Invertocat_Logo.svg" width="15" height="15" alt="GitHub">
+        </a> |
+        <a href="https://github.com/slevithan/awesome-regex">Awesome Regex</a> |
+        <a href="https://github.com/slevithan/xregexp">XRegExp</a> |
+        <a href="https://www.amazon.com/dp/1449319432/?tag=slev-20">Regular Expressions Cookbook</a> |
+        <a href="https://slev.life/">Lifecurious</a>
+      </p>
+    </footer>
+  </main>
+</template>
+
+<script setup lang="ts">
+import { computed, onMounted, ref, watch } from 'vue'
+import { colorizeAll, colorizePattern, loadStyles } from 'regex-colorizer-ts'
+
+const placeholder = 'Type a regex pattern'
+const pattern = ref('')
+const useUnicode = ref(false)
+const flags = computed(() => (useUnicode.value ? 'u' : ''))
+const outputHtml = ref('')
+
+function renderOutput() {
+  outputHtml.value = colorizePattern(pattern.value || placeholder, {
+    flags: flags.value,
+  })
+}
+
+onMounted(() => {
+  loadStyles()
+  renderOutput()
+  colorizeAll({ selector: '.regex' })
+})
+
+watch([pattern, flags], renderOutput)
+</script>
+
+<style scoped lang="scss">
+@font-face {
+  font-family: "Open Sans";
+  font-style: normal;
+  font-weight: 400;
+  src: local(""),
+  url("assets/fonts/OpenSans-VariableFont_wdth,wght.ttf") format("woff2");
+}
+
+@font-face {
+  font-family: "Bebas Neue";
+  font-style: normal;
+  font-weight: 400;
+  src: local(""),
+  url("assets/fonts/BebasNeue-Regular.ttf") format("ttf");
+}
+
+@font-face {
+  font-family: "Ubuntu Mono";
+  font-style: normal;
+  font-weight: 400;
+  src: local(""),
+  url("assets/fonts/UbuntuMono-Regular.ttf") format("ttf");
+}
+
+* {
+  font-family: "Open Sans", sans-serif;
+}
+</style>

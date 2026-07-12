@@ -1,0 +1,2 @@
+overrides:
+  regex-colorizer-ts: link:../../../.local/share/pnpm/global/5/node_modules/regex-colorizer-ts

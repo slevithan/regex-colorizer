@@ -683,10 +683,12 @@ function colorizePattern (pattern: string, {
     // Quantifier
     } else if (quantifier.test(m)) {
       if (lastToken.quantifiable) {
-        const intervals = /^\{(\d+)(?:,(\d*))?/.exec(m)!;
-        const secondInterval = +(intervals[1] ?? NaN);
-        const thirdInterval = +(intervals[2] ?? NaN);
-
+        const intervals = /^\{(\d+)(?:,(\d*))?/.exec(m);
+        let [secondInterval, thirdInterval] = [NaN, NaN];
+        if (intervals) {
+          secondInterval = +(intervals[1] ?? NaN);
+          thirdInterval = +(intervals[2] ?? NaN);
+        }
         // Interval quantifier out of range for old Firefox
         if (intervals && (secondInterval > 65535 || (thirdInterval > 65535))) {
           output += to.error(m, error.INTERVAL_OVERFLOW);
