@@ -153,15 +153,27 @@ type LastTokenType = {
  * @param {Object} flagsObj Whether each flag is enabled.
  * @returns {string}
  */
-function parseCharClass(value: string, flagsObj: { [x: string]: boolean; unicode?: any; }): string {
+function parseCharClass(
+  value: string, flagsObj: { [x: string]: boolean; unicode?: any; }
+): string {
   let output = '';
   let lastToken: LastTokenType = {
     rangeable: false,
     type: type.NONE,
   };
-  const {opening, content, closing} = charClassParts.exec(value).groups;
+
+  const execResult = charClassParts.exec(value);
+  if (!execResult || !execResult.groups) {
+    return output;
+  }
+
+  const {opening, content, closing} = execResult.groups
+  if (opening === undefined || closing === undefined || content === undefined) {
+    return output
+  }
 
   const matches = content.matchAll(charClassToken);
+
   for (const match of matches) {
     const m = match[0];
     // Escape
@@ -204,7 +216,7 @@ function parseCharClass(value: string, flagsObj: { [x: string]: boolean; unicode
         output += to.error(m, error.INCOMPLETE_TOKEN);
         // Don't need to set lastToken since this is the end of the line
       // '\p{...}' or '\P{...}': Unicode property in Unicode mode, or escaped literal '\p' and following chars
-      } else if (match.groups.property) {
+      } else if (match.groups && match.groups.property) {
         if (flagsObj.unicode) {
           output += to.metasequence(m);
           lastToken = {
@@ -261,11 +273,13 @@ function parseCharClass(value: string, flagsObj: { [x: string]: boolean; unicode
         if (nextToken) {
           const nextTokenCharCode = getTokenCharCode(nextToken[0]);
           // Hypen for a reverse range (ex: z-a) or shorthand class (ex: \d-x or x-\S)
+          const charCode = lastToken.charCode ? lastToken.charCode : NaN;
+
           if (
-            (!isNaN(nextTokenCharCode) && lastToken.charCode > nextTokenCharCode) ||
+            (!isNaN(nextTokenCharCode) && charCode > nextTokenCharCode) ||
             lastToken.type === type.SHORT_CLASS ||
             /^\\[dsw]$/i.test(nextToken[0]) ||
-            (flagsObj.unicode && nextToken.groups.property)
+            (flagsObj.unicode && nextToken.groups?.property)
           ) {
             output += to.error('-', error.INVALID_RANGE);
           // Hyphen creating a valid range
@@ -324,8 +338,9 @@ function getPatternDetails(pattern: string): {
   const captureNames: Set<string> = new Set();
   let totalCaptures = 0;
   const matches = pattern.matchAll(regexToken);
+
   for (const match of matches) {
-    const captureName = match.groups.captureName;
+    const captureName = match.groups && match.groups.captureName;
     if (captureName) {
       captureNames.add(captureName);
     }
@@ -346,9 +361,9 @@ function getPatternDetails(pattern: string): {
  * @returns {Object}
  */
 function getFlagsObj(flags: string): {
-  [p: string]: boolean, unicode?: any
+  [p: string]: boolean, unicode?: boolean
 } {
-  const flagNames = {
+  const flagNames: {[key: string]: string} = {
     d: 'hasIndices',
     g: 'global',
     i: 'ignoreCase',
@@ -358,10 +373,11 @@ function getFlagsObj(flags: string): {
     v: 'unicodeSets',
     y: 'sticky',
   };
-  const flagsObj: {[p: string]: boolean, unicode?: any} = Object.fromEntries(
+  const flagsObj: {[p: string]: boolean} = Object.fromEntries(
     Object.values(flagNames).map(value => [value, false])
   );
   const flagsSet = new Set();
+
   for (const char of flags) {
     if (flagsSet.has(char)) {
       throw new Error(`Duplicate flag: ${char}`);
@@ -370,7 +386,8 @@ function getFlagsObj(flags: string): {
       throw new Error(`Unknown flag: ${char}`);
     }
     flagsSet.add(char);
-    flagsObj[flagNames[char]] = true;
+    const flagName: string = flagNames[char]!;
+    flagsObj[flagName] = true;
   }
   if (flagsObj.unicodeSets) {
     throw new Error ('Flag v is not yet supported');
@@ -399,7 +416,12 @@ function colorizePattern (pattern: string, {
     totalCaptures,
   } = getPatternDetails(pattern);
   const usedCaptureNames = new Set();
-  const openGroups = [];
+
+  type OpenGroup =
+    { valid: false, opening: string } |
+    { valid: true, opening: string, index: number }
+  const openGroups: OpenGroup[] = [];
+
   let capturingGroupCount = 0;
   let groupStyleDepth = 0;
   let lastToken: LastTokenType = {
@@ -421,7 +443,7 @@ function colorizePattern (pattern: string, {
       };
     // Group opening
     } else if (char0 === '(') {
-      const captureName = match.groups.captureName;
+      const captureName = match.groups?.captureName;
       groupStyleDepth = groupStyleDepth === 5 ? 1 : groupStyleDepth + 1;
       // '(?<name>' with a duplicate name
       if (usedCaptureNames.has(captureName)) {
@@ -453,7 +475,9 @@ function colorizePattern (pattern: string, {
     // Group closing
     } else if (m === ')') {
       // If this is an invalid group closing
-      if (!openGroups.length || !openGroups.at(-1).valid) {
+      const lastOpenGroup = openGroups.at(-1);
+
+      if (!openGroups.length || !lastOpenGroup?.valid) {
         output += to.error(m, error.UNBALANCED_RIGHT_PAREN);
         lastToken = {
           quantifiable: false,
@@ -464,7 +488,7 @@ function colorizePattern (pattern: string, {
         // you'd expect in JavaScript, and is an error with flag u or v (and in some other regex
         // flavors such as PCRE), so flag them as unquantifiable
         lastToken = {
-          quantifiable: !/^\(\?<?[=!]/.test(collapseEntities(openGroups.at(-1).opening)),
+          quantifiable: !/^\(\?<?[=!]/.test(collapseEntities(lastOpenGroup.opening)),
           groupStyleDepth,
         };
       }
@@ -505,7 +529,7 @@ function colorizePattern (pattern: string, {
           // Octal followed by literal, or escaped literal followed by literal
           } else {
             const {escapedNum, escapedLiteral, literal} =
-              new RegExp(String.raw`^\\(?<escapedNum>${octalRange}|(?<escapedLiteral>[89]))(?<literal>\d*)`).exec(m).groups;
+              new RegExp(String.raw`^\\(?<escapedNum>${octalRange}|(?<escapedLiteral>[89]))(?<literal>\d*)`).exec(m)!.groups ?? {};
             if (escapedLiteral) {
               // For \8 and \9 (escaped non-octal digits) when as many capturing groups aren't in
               // the pattern, they match '8' and '9' (when not using flag u or v).
@@ -530,8 +554,10 @@ function colorizePattern (pattern: string, {
         // With flag u or v, the rules change to always use backreference mode
         // Backreference mode for \k
         if (captureNames.size) {
+          const backrefName = match?.groups?.backrefName
+
           // Valid
-          if (captureNames.has(match.groups.backrefName)) {
+          if (backrefName && captureNames.has(backrefName)) {
             output += to.backref(expandEntities(m));
             lastToken = {
               quantifiable: true,
@@ -563,7 +589,7 @@ function colorizePattern (pattern: string, {
           };
         }
       // '\p{...}' or '\P{...}': Unicode property in Unicode mode, or escaped literal '\p' and following chars
-      } else if (match.groups.property) {
+      } else if (match?.groups?.property) {
         if (flagsObj.unicode) {
           output += to.metasequence(m);
         } else {
@@ -657,15 +683,18 @@ function colorizePattern (pattern: string, {
     // Quantifier
     } else if (quantifier.test(m)) {
       if (lastToken.quantifiable) {
-        const interval = /^\{(\d+)(?:,(\d*))?/.exec(m);
+        const intervals = /^\{(\d+)(?:,(\d*))?/.exec(m)!;
+        const secondInterval = +(intervals[1] ?? NaN);
+        const thirdInterval = +(intervals[2] ?? NaN);
+
         // Interval quantifier out of range for old Firefox
-        if (interval && (+interval[1] > 65535 || (interval[2] && +interval[2] > 65535))) {
+        if (intervals && (secondInterval > 65535 || (thirdInterval > 65535))) {
           output += to.error(m, error.INTERVAL_OVERFLOW);
         // Interval quantifier in reverse numeric order
-        } else if (interval && interval[2] && (+interval[1] > +interval[2])) {
+        } else if (intervals && thirdInterval && (secondInterval > thirdInterval)) {
           output += to.error(m, error.INTERVAL_REVERSED);
         } else {
-          // Quantifiers for groups are shown in the style of the (preceeding) group's depth
+          // Quantifiers for groups are shown in the style of the (preceding) group's depth
           output += to.quantifier(m, lastToken.groupStyleDepth ?? 0);
         }
       } else {
@@ -792,7 +821,7 @@ function loadStyles() {
 .${styleId} b.g4 {background: #30ea60; color: #125824;}
 .${styleId} b.g5 {background: #0c8d15; color: #fff;}
   `;
-  document.querySelector('head').appendChild(ss);
+  document.querySelector('head')!.appendChild(ss);
 }
 
 export {
