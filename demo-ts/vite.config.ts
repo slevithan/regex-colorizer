@@ -1,20 +1,15 @@
-import { fileURLToPath, URL } from 'node:url'
-
+import _config from './_config.js';
 import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
-import vueJsx from '@vitejs/plugin-vue-jsx'
-import vueDevTools from 'vite-plugin-vue-devtools'
 
-// https://vite.dev/config/
+const HOST = _config.server.host;
+const PORT = _config.server.port;
+
 export default defineConfig({
-  plugins: [
-    vue(),
-    vueJsx(),
-    vueDevTools(),
-  ],
-  resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
-    },
+  server: {
+    host: HOST,
+    port: PORT,
   },
-})
+  build: {
+    target: 'es2020',
+  },
+});

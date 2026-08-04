@@ -12,8 +12,10 @@
     "prebuild": "rimraf --glob dist/*",
     "build-js": "esbuild src/index.ts --bundle --minify --outfile=dist/regex-colorizer.min.js --global-name=RegexColorizer",
     "build": "tsup",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "prepare": "pnpm build"
+    "prepare": "pnpm build",
+    "test": "node --test './src/**/*.test.ts'",
+    "types:check": "tsc --noEmit",
+    "prepack": "tsc"
   },
   "files": [
     "dist",

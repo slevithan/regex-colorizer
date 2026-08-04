@@ -1,32 +1,37 @@
-import { globalIgnores } from 'eslint/config'
-import { defineConfigWithVueTs, vueTsConfigs } from '@vue/eslint-config-typescript'
-import pluginVue from 'eslint-plugin-vue'
-import pluginVitest from '@vitest/eslint-plugin'
-import pluginOxlint from 'eslint-plugin-oxlint'
-import skipFormatting from 'eslint-config-prettier/flat'
+import js from '@eslint/js';
+import prettierConfig from 'eslint-config-prettier/flat';
+import prettierPlugin from 'eslint-plugin-prettier/recommended';
+import { configs as sonarjs } from 'eslint-plugin-sonarjs';
+import unicorn from 'eslint-plugin-unicorn';
+import { defineConfig } from 'eslint/config';
+import globals from 'globals';
+import tseslint from 'typescript-eslint';
 
-// To allow more languages other than `ts` in `.vue` files, uncomment the following lines:
-// import { configureVueProject } from '@vue/eslint-config-typescript'
-// configureVueProject({ scriptLangs: ['ts', 'tsx'] })
-// More info at https://github.com/vuejs/eslint-config-typescript/#advanced-setup
-
-export default defineConfigWithVueTs(
+export default defineConfig([
+  js.configs.recommended,
+  sonarjs.recommended,
+  unicorn.configs.recommended,
+  tseslint.configs.recommended,
+  prettierConfig,
+  prettierPlugin,
   {
-    name: 'app/files-to-lint',
-    files: ['**/*.{vue,ts,mts,tsx}'],
+    files: ['**/*.js'],
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+        ...globals.es2021
+      }
+    },
+    rules: {
+      // unicorn adjustments
+      'unicorn/prevent-abbreviations': 'off',
+      'unicorn/no-null': 'off'
+    }
   },
-
-  globalIgnores(['**/dist/**', '**/dist-ssr/**', '**/coverage/**']),
-
-  ...pluginVue.configs['flat/essential'],
-  vueTsConfigs.recommended,
-
   {
-    ...pluginVitest.configs.recommended,
-    files: ['src/**/__tests__/*'],
-  },
-
-  ...pluginOxlint.buildFromOxlintConfigFile('.oxlintrc.json'),
-
-  skipFormatting,
-)
+    ignores: ['dist/**', 'node_modules/**', '**/*.html']
+  }
+]);

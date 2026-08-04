@@ -1,0 +1,176 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+body {
+  font-family: Calibri, "Helvetica Neue", sans-serif;
+  background-color: #c9e4ff;
+  background: repeating-linear-gradient(45deg, #d6ebff, #d6ebff 3px, #c9e4ff 3px, #c9e4ff 10px);
+}
+
+#content {
+  background-color: #fff;
+  max-width: 65rem;
+  padding: 2.8vw 4.5vw;
+  margin: 0 auto;
+  box-shadow: 0 0 0 10px #80c0ff;
+}
+
+h1, h2, ul, p, pre, figure {
+  margin-bottom: 12px;
+}
+
+h1, h2 {
+  font-family: Cambria, Cochin, Georgia;
+}
+
+h2 {
+  margin-top: 18px;
+}
+
+h3 {
+  font-size: 1em;
+  margin-top: 4px;
+  margin-bottom: 2px;
+}
+
+.no-margin-collapse {
+  margin-bottom: 30px;
+}
+
+div.info {
+  border-left: 10px solid #80c0ff;
+  border-radius: 0.375em;
+  background-color: #d6ebff;
+  padding: 0.5em;
+}
+
+div.info code {
+  background-color: #80c0ff;
+}
+
+textarea {
+  width: 100%;
+  min-height: 55px;
+  max-height: 155px;
+  /* Copy the whitepace/wrapping styles applied to regexes by Regex Colorizer's themes */
+  white-space: pre-wrap;
+  word-break: break-all;
+  overflow-wrap: anywhere;
+  border-radius: 0.375em;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: box-shadow 0.2s ease;
+  background-color: #fcfcfc;
+}
+
+textarea:focus {
+  outline: none;
+  box-shadow: 0 0 8px #80c0ff;
+}
+
+pre, code, textarea {
+  font-family: Consolas, "Source Code Pro", Monospace;
+  font-size: 1em;
+}
+
+pre, code {
+  border-radius: 0.375em;
+}
+
+pre.regex, textarea {
+  padding: 0.6em;
+}
+
+.regex {
+  border: 1px dotted #aaa;
+}
+
+.html-output-example .regex {
+  border: none;
+}
+
+pre {
+  display: inline-block;
+}
+
+pre:has(code), code {
+  background-color: #f3f3f3;
+}
+
+pre:has(code) {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+pre code {
+  display: block;
+  padding: 1em;
+}
+
+code {
+  padding: 0 3px;
+}
+
+code.regex {
+  padding: 1px;
+  background-color: inherit;
+}
+
+button {
+  font-weight: bold;
+  border-radius: 0.4em;
+  padding: 0.6em 1em;
+  margin-right: 4px;
+}
+
+small {
+  font-size: 0.8em;
+}
+
+footer {
+  color: #aaa;
+  margin-top: 40px;
+}
+
+footer a {
+  color: inherit;
+  text-decoration: none;
+}
+
+footer a:hover {
+  color: initial;
+}
+
+footer img, h1 img:hover {
+  filter: invert(70%);
+}
+
+footer img:hover {
+  filter: unset;
+}
+
+img {
+  vertical-align: middle;
+}
+
+figure:has(pre.regex) {
+  display: inline-block;
+  border-radius: 0.375em;
+  background-color: #f9f9f9;
+  padding: 0.3em;
+}
+
+figure pre.regex {
+  width: 100%;
+  background-color: #fff;
+  margin-bottom: 6px;
+}
+
+footer p:last-of-type, div.info p {
+  margin-bottom: 0;
+}
+
+.hidden {
+  display: none;
+}

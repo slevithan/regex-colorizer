@@ -13,6 +13,10 @@ Errors are highlighted, along with some edge cases that can cause cross-browser 
 
 ## 🧪 Demo
 
+Run the vue-ts demo with 
+1. `pnpm --dir ./demo-vue-ts install --ignore-workspace`
+2. `pnpm --dir ./demo-vue-ts dev`
+
 Try it out on the [**demo page**](https://slevithan.github.io/regex-colorizer/demo/), which also includes more details.
 
 ## 🕹️ Install and use

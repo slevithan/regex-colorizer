@@ -1,0 +1,64 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: Tests
+on:
+  pull_request:
+    branches: ['*']
+jobs:
+  check-types:
+    # Separate these from tests because
+    # they are platform and node-version independent
+    # and need be run only once.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          package_json_file: package.json
+          cache: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+      - name: pnpm clean install
+        run: pnpm i --force --frozen-lockfile
+      # You may want to run a lint check here too
+      - run: pnpm run types:check
+  get-matrix:
+    # Automatically pick active LTS versions
+    runs-on: ubuntu-latest
+    outputs:
+      latest: ${{ steps.set-matrix.outputs.requireds }}
+    steps:
+      - uses: ljharb/actions/node/matrix@main
+        id: set-matrix
+        with:
+          versionsAsRoot: true
+          type: majors
+          preset: '>= 22' # glob is not backported below 22.x
+  test:
+    needs: [get-matrix]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: ${{ fromJson(needs.get-matrix.outputs.latest) }}
+        os:
+          - macos-latest
+          - ubuntu-latest
+          - windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use node ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          package_json_file: package.json
+          cache: false
+      - name: pnpm clean install
+        run: pnpm i --force --frozen-lockfile
+      - run: pnpm run types:check
