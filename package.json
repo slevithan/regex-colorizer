@@ -1,6 +1,6 @@
 {
   "name": "regex-colorizer-ts",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Highlight regex syntax",
   "homepage": "https://github.com/milselarch/regex-colorizer",
   "author": "milselarch",
