@@ -1,18 +1,29 @@
 {
-  "name": "regex-colorizer",
-  "version": "1.0.2",
+  "name": "regex-colorizer-ts",
+  "version": "1.0.3",
   "description": "Highlight regex syntax",
   "homepage": "https://slevithan.github.io/regex-colorizer/demo/",
   "author": "Steven Levithan",
   "license": "MIT",
   "type": "module",
-  "exports": "./src/index.js",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
   "browser": "./dist/regex-colorizer.min.js",
   "scripts": {
     "prebuild": "rimraf --glob dist/*",
-    "build": "esbuild src/index.js --bundle --minify --outfile=dist/regex-colorizer.min.js --global-name=RegexColorizer",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "prepare": "pnpm build"
+    "build-js": "esbuild src/index.ts --bundle --minify --outfile=dist/regex-colorizer.min.js --global-name=RegexColorizer",
+    "build": "tsup",
+    "prepare": "pnpm build",
+    "test": "node --test './src/**/*.test.ts'",
+    "types:check": "tsc --noEmit",
+    "prepack": "tsc"
   },
   "files": [
     "dist",
@@ -29,7 +40,11 @@
   ],
   "devDependencies": {
     "esbuild": "^0.27.3",
-    "rimraf": "^6.1.3"
+    "rimraf": "^6.1.3",
+    "tsup": "^8.5.1"
   },
-  "packageManager": "pnpm@10.32.0"
+  "packageManager": "pnpm@10.32.0",
+  "dependencies": {
+    "typescript": "^6.0.3"
+  }
 }

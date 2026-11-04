@@ -4,14 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Regex Colorizer</title>
-  <link id="default-ss" href="../themes/default.css" rel="stylesheet" title="Default">
-  <link id="nobg-ss" href="../themes/nobg.css" rel="alternate stylesheet" title="No BG">
-  <link id="regexpal-ss" href="../themes/regexpal.css" rel="alternate stylesheet" title="RegexPal">
-  <link id="regexbuddy-ss" href="../themes/regexbuddy.css" rel="alternate stylesheet" title="RegexBuddy">
-  <link href="styles.css" rel="stylesheet">
+  <link id="default-ss" href="/src/themes/default.css" rel="stylesheet" title="Default">
+  <link id="nobg-ss" href="/src/themes/nobg.css" rel="alternate stylesheet" title="No BG">
+  <link id="regexpal-ss" href="/src/themes/regexpal.css" rel="alternate stylesheet" title="RegexPal">
+  <link id="regexbuddy-ss" href="/src/themes/regexbuddy.css" rel="alternate stylesheet" title="RegexBuddy">
   <!-- Highlighting for non-regex code on the page -->
   <link href="https://unpkg.com/@highlightjs/cdn-assets@11.11.1/styles/default.min.css" rel="stylesheet">
+  <script type="module" src="/src/app/index.ts"></script>
 </head>
+
 <body>
   <div id="content">
     <h1>
@@ -34,12 +35,21 @@
     <pre class="regex">(["'])(?:\\?.)*?\1</pre>
 
     <h2>Try it</h2>
-    <p><textarea placeholder="Type a regex pattern" spellcheck="false" oninput="showOutput(this.value || this.placeholder); autoGrow(this)"></textarea></p>
+    <p>
+      <label>
+        <textarea
+          id="input"
+          placeholder="Type a regex pattern"
+          spellcheck="false"
+        ></textarea>
+      </label>
+    </p>
+
     <figure>
       <pre id="output" class="regex">Type a regex pattern</pre>
       <figcaption>
         <label>
-          <input type="checkbox" onchange="setFlagsFor('output', this.checked ? 'u' : '')">
+          <input type="checkbox" id="flag-u-checkbox">
           Flag <code>u</code> <small>(<code>unicode</code>)</small>
         </label>
       </figcaption>
@@ -48,10 +58,10 @@
     <h2>Themes</h2>
     <p>Several themes are available as stylesheets. Select an option to change the highlighting styles for all regexes on this page.</p>
     <p>
-      <button id="default-btn" onclick="setTheme('default')" disabled>Default</button>
-      <button id="nobg-btn" onclick="setTheme('nobg')">No BG</button>
-      <button id="regexpal-btn" onclick="setTheme('regexpal')">RegexPal</button>
-      <button id="regexbuddy-btn" onclick="setTheme('regexbuddy')">RegexBuddy</button>
+      <button id="default-btn" disabled>Default</button>
+      <button id="nobg-btn">No BG</button>
+      <button id="regexpal-btn">RegexPal</button>
+      <button id="regexbuddy-btn">RegexBuddy</button>
     </p>
     <div class="info no-margin-collapse">
       <p id="info-theme-default">You don't need to add a stylesheet to your page to use the default theme. Just run <code>loadStyles()</code>.</p>
@@ -64,24 +74,24 @@
     <h3>Regex with errors</h3>
     <p>Errors are highlighted in red, along with some edge cases that can cause cross-browser grief. Hover over errors for a description of the problem.</p>
     <pre class="regex">Oh h\i+?? x*+ |? a{1,2}b{2,1} ||(?:a|b)* (?&lt;=(?&lt;name>x))* (?>n)
-((((?:((a))b.c)d|x(y){65536,}))))
-[^1-59-6\b-\cX.a-\w!---] \xFF \x \uFF\uFFFF\z\v\1\\\</pre>
+  ((((?:((a))b.c)d|x(y){65536,}))))
+  [^1-59-6\b-\cX.a-\w!---] \xFF \x \uFF\uFFFF\z\v\1\\\</pre>
     <h3>Octals and backreferences</h3>
     <p>Regex syntax is complex, so Regex Colorizer's highlighting is contextually aware of things that happen forward and backward in the regex. Here's an example of contextually-aware highlighting of regex syntax:</p>
     <figure>
-      <pre id="octalsRegex" class="regex">\+ Escapes are backreferences if num &lt;= capturing groups
-\1 \8 \9 \10 \k&lt;1> \k&lt;name>
-\+ Octals: leading 0 extends length
-\11 \100 \1234 \01234 \00123 \0 \00 \00000 \377 \400
-\+ Non-octal digits
-\18 \80 \90
-\+ Leading 0 in character class doesn't extend length
-[ \1234 is the same but not \0123; no backrefs \1 ]
-\+ Capturing groups can appear after their backrefs
-(1)(2)(?&lt;name>3)(4)(5)(6)(7)(8)(9)(10)</pre>
+      <pre id="octals-regex" class="regex">\+ Escapes are backreferences if num &lt;= capturing groups
+  \1 \8 \9 \10 \k&lt;1> \k&lt;name>
+  \+ Octals: leading 0 extends length
+  \11 \100 \1234 \01234 \00123 \0 \00 \00000 \377 \400
+  \+ Non-octal digits
+  \18 \80 \90
+  \+ Leading 0 in character class doesn't extend length
+  [ \1234 is the same but not \0123; no backrefs \1 ]
+  \+ Capturing groups can appear after their backrefs
+  (1)(2)(?&lt;name>3)(4)(5)(6)(7)(8)(9)(10)</pre>
       <figcaption>
         <label>
-          <input type="checkbox" onchange="setFlagsFor('octalsRegex', this.checked ? 'u' : '')">
+          <input type="checkbox">
           Flag <code>u</code> <small>(<code>unicode</code>)</small>
         </label>
       </figcaption>
@@ -95,39 +105,41 @@
 
     <h2>Usage</h2>
     <p>Here's how to highlight all your regexes like you can see running on this page:</p>
-    <pre><code class="language-javascript">import {colorizeAll, colorizePattern, loadStyles} from 'regex-colorizer';
+    <pre><code class="language-javascript">
+  import {colorizeAll, colorizePattern, loadStyles} from 'regex-colorizer';
 
-// Don't run this line if you provide your own stylesheet
-loadStyles();
+  // Don't run this line if you provide your own stylesheet
+  loadStyles();
 
-// Highlight all elements with class `regex`
-colorizeAll();
+  // Highlight all elements with class `regex`
+  colorizeAll();
 
-// Or provide a `querySelectorAll` value for elements to highlight
-colorizeAll({
-  selector: '.regex',
-});
+  // Or provide a `querySelectorAll` value for elements to highlight
+  colorizeAll({
+    selector: '.regex',
+  });
 
-// Optionally provide flags
-colorizeAll({
-  // Flags provided in `data-flags` attributes will override this
-  flags: 'u',
-});
+  // Optionally provide flags
+  colorizeAll({
+    // Flags provided in `data-flags` attributes will override this
+    flags: 'u',
+  });
 
-// You can also just get the highlighting HTML for a specific pattern
-element.innerHTML = colorizePattern('(?&lt;=\\d)', {
-  flags: 'u',
-});</code></pre>
+  // You can also just get the highlighting HTML for a specific pattern
+  element.innerHTML = colorizePattern('(?&lt;=\\d)', {
+    flags: 'u',
+  });
+  </code></pre>
 
     <p>In your HTML:</p>
     <pre><code class="language-html">&lt;p>
-  This regex is highlighted inline:
-  &lt;code class="regex">(?&amp;lt;=\d)\p{L}\8&lt;/code>.
+    This regex is highlighted inline:
+    &lt;code class="regex">(?&amp;lt;=\d)\p{L}\8&lt;/code>.
 
-  And here's the same regex but with different rules from flag u:
-  &lt;code class="regex" data-flags="u">(?&amp;lt;=\d)\p{L}\8&lt;/code>.
-  &lt;!-- Can include any valid flags. Ex: data-flags="gimsuyd" --&gt;
-&lt;/p></code></pre>
+    And here's the same regex but with different rules from flag u:
+    &lt;code class="regex" data-flags="u">(?&amp;lt;=\d)\p{L}\8&lt;/code>.
+    &lt;!-- Can include any valid flags. Ex: data-flags="gimsuyd" --&gt;
+  &lt;/p></code></pre>
 
     <p>Output:</p>
     <div class="html-output-example">
@@ -154,49 +166,10 @@ element.innerHTML = colorizePattern('(?&lt;=\\d)', {
     </footer>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/regex-colorizer/dist/regex-colorizer.min.js"></script>
-  <!-- <script src="../dist/regex-colorizer.min.js"></script> -->
-  <script>
-    RegexColorizer.colorizeAll();
-
-    function showOutput(pattern) {
-      document.getElementById('output').innerHTML = pattern;
-      RegexColorizer.colorizeAll({
-        selector: '#output',
-      });
-      // Alternatively, could use `RegexColorizer.colorizePattern` and assign to `innerHTML`
-    }
-
-    function autoGrow(el) {
-      el.style.height = '0';
-      el.style.height = (el.scrollHeight + 5) + 'px';
-    }
-
-    function setTheme(name) {
-      const themes = ['default', 'nobg', 'regexpal', 'regexbuddy'];
-      themes.forEach(theme => {
-        document.getElementById(`${theme}-btn`).disabled = theme === name;
-        document.getElementById(`info-theme-${theme}`).classList.toggle('hidden', theme !== name);
-        // Need to disable all stylesheets before enabling the active one
-        document.getElementById(`${theme}-ss`).disabled = true;
-      });
-      document.getElementById(`${name}-ss`).disabled = false;
-    }
-
-    function setFlagsFor(id, flags) {
-      document.getElementById(id).dataset.flags = flags;
-      RegexColorizer.colorizeAll({
-        selector: `#${id}`,
-        // Alternatively, if not using the `data-flags` attribute:
-        // flags,
-      });
-    }
-  </script>
-
   <!-- Highlighting for non-regex code on the page -->
   <script src="https://unpkg.com/@highlightjs/cdn-assets@11.11.1/highlight.min.js"></script>
   <script>
     hljs.highlightAll();
   </script>
-</body>
+  </body>
 </html>
